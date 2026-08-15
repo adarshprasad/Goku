@@ -442,7 +442,7 @@ async function main() {
   const adminHash = await bcrypt.hash("huduku-admin", 10);
   const customerHash = await bcrypt.hash("huduku123", 10);
 
-  const admin = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email: "admin@huduku.in",
       name: "Huduku Atelier",

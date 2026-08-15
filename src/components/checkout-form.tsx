@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatInr } from "@/lib/utils";
 
 type CheckoutFormProps = {
   email: string;
@@ -216,6 +215,3 @@ function loadScript(src: string) {
   });
 }
 
-export function formatCheckoutSubtotal(n: number) {
-  return formatInr(n);
-}
