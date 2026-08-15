@@ -17,6 +17,49 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Deploy (GitLab)
+
+**GitLab alone cannot host this shop.** GitLab stores git and can run CI (`.gitlab-ci.yml`). The app is Next.js with a database, APIs, and checkout — not a static site — so **GitLab Pages will not work**.
+
+### Run on your laptop
+
+```bash
+git clone <your-gitlab-repo-url>
+cd <repo>
+cp .env.example .env
+# put a long random string in AUTH_SECRET and NEXTAUTH_SECRET
+npm install
+npx prisma db push
+npm run db:seed
+npm run dev
+```
+
+Then visit `http://localhost:3000`. Admin: `admin@huduku.in` / `huduku-admin`.
+
+### Put it on the internet (recommended)
+
+1. Create a **Postgres** database (Neon, Supabase, or Render Postgres). Copy the connection string.
+2. In `prisma/schema.prisma` change `provider = "sqlite"` to `provider = "postgresql"`.
+3. Create an app on **[Render](https://render.com)**, **[Railway](https://railway.app)**, **[Fly.io](https://fly.io)**, or **Vercel**, and **connect the GitLab repo** (they pull from GitLab; you do not need GitHub).
+4. Set environment variables from `.env.example`, using your public URL:
+
+```
+DATABASE_URL=postgresql://...
+AUTH_SECRET=<openssl rand -base64 32>
+NEXTAUTH_SECRET=<same as AUTH_SECRET>
+AUTH_URL=https://your-domain.com
+NEXTAUTH_URL=https://your-domain.com
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+```
+
+5. Build command: `npx prisma generate && npx prisma db push && npm run db:seed && npm run build`  
+   Start command: `npm start`  
+   (Seed only the first time, or you will wipe orders.)
+
+6. Optional: add Razorpay keys and set the webhook URL to `https://your-domain.com/api/webhooks/razorpay`.
+
+GitLab CI (`.gitlab-ci.yml`) will **test and build** on every push. Use a host above to **run** the site. A `Dockerfile` is included if you prefer a container (Fly, Cloud Run, a VPS).
+
 | Role | Email | Password |
 |------|--------|----------|
 | Customer | customer@huduku.in | huduku123 |
