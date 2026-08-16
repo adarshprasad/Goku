@@ -1,32 +1,30 @@
-# Test APK (standalone — no Metro)
+# Install Huduku on the phone
 
-Uninstall the **old Huduku** app first (it was a debug build and needs a computer). Then install this one.
+**This file is Android only.** An iPhone cannot install an `.apk`.
 
-## Download
+## You must install `huduku.apk`, not `.gz`
 
-From GitLab/GitHub branch `cursor/huduku-saree-store-939e`:
-
-**`apps/mobile/releases/huduku.apk.gz`**
-
-Direct (GitHub):  
-https://github.com/adarshprasad/Goku/raw/cursor/huduku-saree-store-939e/apps/mobile/releases/huduku.apk.gz
-
-On Mac or Fedora:
+If the file is `huduku.apk.gz`, unzip it first on a computer:
 
 ```bash
-cd ~/huduku   # or git pull in your clone
-git pull
-cd apps/mobile/releases
 gzip -d -k huduku.apk.gz
 ```
 
-Copy **`huduku.apk`** to the phone → open it → allow unknown apps → install.
+The installable file name must be **`huduku.apk`**.
 
-## First open
+Download (GitHub, use this exact link so you get the file, not an HTML page):
 
-Paste the shop URL:
+https://github.com/adarshprasad/Goku/raw/cursor/huduku-saree-store-939e/apps/mobile/releases/huduku.apk
 
-- Same Wi‑Fi: `http://192.168.29.238:3000`
-- Off Wi‑Fi: your `https://….trycloudflare.com`
+Or after `git pull`: `apps/mobile/releases/huduku.apk`
 
-The Fedora shop must be running (`npm start`).
+## On Android
+
+1. Uninstall any old **Huduku** app.
+2. Copy `huduku.apk` to the phone (USB, Drive, WhatsApp).
+3. Chrome/Files → tap the apk.
+4. If blocked: Settings → Apps → Special access → **Install unknown apps** → allow Chrome or Files.
+5. Xiaomi/Vivo/Oppo: also turn off “Install via USB” blocking / allow that installer.
+6. Open Huduku → paste `http://192.168.29.238:3000` or your https tunnel URL.
+
+If it still says parse error / not installed, the download was the webpage. Use the **raw** link above, or copy the apk from Fedora with USB.
