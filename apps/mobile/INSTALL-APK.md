@@ -1,4 +1,21 @@
-# Install test APK on your phone
+# Test APK
+
+Download **`apps/mobile/releases/huduku-debug.apk.gz`** from GitLab (same branch as the shop: `cursor/huduku-saree-store-939e`).
+
+On Mac or Fedora:
+
+```bash
+git pull
+cd apps/mobile/releases
+gzip -d -k huduku-debug.apk.gz
+```
+
+That creates `huduku-debug.apk`. Copy it to the phone (USB, Drive, WhatsApp).
+
+On the phone: open the APK → allow unknown apps → install **Huduku** → paste shop URL (`http://192.168.29.238:3000` or your trycloudflare link).
+
+Debug build, 64-bit phones only. Not for Play Store.
+
 
 A debug APK was built (`assembleDebug`). It is large (~115 MB) so it is **not** stored in Git. Build it on your Mac or Fedora, then copy to the phone.
 
