@@ -4,6 +4,21 @@ Premium saree atelier storefront — Next.js, Prisma (SQLite locally / Postgres 
 
 **Hennige anda seere inda** — adds beauty to the woman.
 
+## Phone app in ~5 minutes
+
+Do **not** expect Play Store in 5 minutes. Use **Expo Go**:
+
+```bash
+cd apps/mobile
+npm install
+# URL that already opens the shop in your phone browser:
+echo 'EXPO_PUBLIC_SITE_URL=https://YOUR-PUBLIC-SHOP-URL' > .env
+npx expo start
+```
+
+Install **Expo Go** on Android/iPhone, scan the QR. Details: [apps/mobile/README.md](apps/mobile/README.md).
+
+
 ## Quick start
 
 ```bash

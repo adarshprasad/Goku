@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Huduku",
+    "slug": "huduku",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "huduku",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.huduku.app"
+    },
+    "android": {
+      "package": "in.huduku.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#6b1d2a"
+      }
+    }
+  }
+}
