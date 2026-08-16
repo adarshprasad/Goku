@@ -1,54 +1,32 @@
-# Test APK
+# Test APK (standalone — no Metro)
 
-Download **`apps/mobile/releases/huduku-debug.apk.gz`** from GitLab (same branch as the shop: `cursor/huduku-saree-store-939e`).
+Uninstall the **old Huduku** app first (it was a debug build and needs a computer). Then install this one.
+
+## Download
+
+From GitLab/GitHub branch `cursor/huduku-saree-store-939e`:
+
+**`apps/mobile/releases/huduku.apk.gz`**
+
+Direct (GitHub):  
+https://github.com/adarshprasad/Goku/raw/cursor/huduku-saree-store-939e/apps/mobile/releases/huduku.apk.gz
 
 On Mac or Fedora:
 
 ```bash
+cd ~/huduku   # or git pull in your clone
 git pull
 cd apps/mobile/releases
-gzip -d -k huduku-debug.apk.gz
+gzip -d -k huduku.apk.gz
 ```
 
-That creates `huduku-debug.apk`. Copy it to the phone (USB, Drive, WhatsApp).
+Copy **`huduku.apk`** to the phone → open it → allow unknown apps → install.
 
-On the phone: open the APK → allow unknown apps → install **Huduku** → paste shop URL (`http://192.168.29.238:3000` or your trycloudflare link).
+## First open
 
-Debug build, 64-bit phones only. Not for Play Store.
+Paste the shop URL:
 
+- Same Wi‑Fi: `http://192.168.29.238:3000`
+- Off Wi‑Fi: your `https://….trycloudflare.com`
 
-A debug APK was built (`assembleDebug`). It is large (~115 MB) so it is **not** stored in Git. Build it on your Mac or Fedora, then copy to the phone.
-
-## On a Mac (easiest)
-
-```bash
-git pull
-cd apps/mobile
-npm install
-npx expo prebuild --platform android
-cd android
-# if you have Android Studio / SDK:
-./gradlew assembleDebug
-```
-
-APK path:
-
-`apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk`
-
-Copy to the phone (USB, Google Drive, WhatsApp to yourself).
-
-## Install on Android
-
-1. Copy `app-debug.apk` to the phone.
-2. Open it in Files.
-3. If asked: **Allow from this source** / install unknown apps.
-4. Open **Huduku**.
-5. First screen: paste the shop URL  
-   - Same Wi‑Fi: `http://192.168.29.238:3000`  
-   - Off Wi‑Fi: your `https://….trycloudflare.com` (shop + tunnel must be running)
-
-This APK is for **testing only** (debug signature). It will not go on Play Store as-is. Most 64-bit phones (2018+) work.
-
-## Fedora (if you install Android SDK there)
-
-Same `npm install` → `npx expo prebuild --platform android` → `./gradlew assembleDebug` inside `apps/mobile/android`.
+The Fedora shop must be running (`npm start`).

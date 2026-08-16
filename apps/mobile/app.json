@@ -12,9 +12,13 @@
     },
     "android": {
       "package": "in.huduku.app",
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "backgroundColor": "#6b1d2a"
       }
-    }
+    },
+    "plugins": [
+      "expo-asset"
+    ]
   }
 }
