@@ -1,69 +1,39 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatInr } from "@/lib/utils";
-import { revalidatePath } from "next/cache";
 
 export default async function AdminProducts() {
   const products = await prisma.product.findMany({
-    include: { variants: true },
-    orderBy: { name: "asc" },
+    include: { variants: true, images: { take: 1, orderBy: { sortOrder: "asc" } } },
+    orderBy: { updatedAt: "desc" },
   });
-
-  async function save(formData: FormData) {
-    "use server";
-    const id = String(formData.get("id"));
-    const price = Math.round(Number(formData.get("price")) * 100);
-    const published = formData.get("published") === "on";
-    await prisma.product.update({
-      where: { id },
-      data: { pricePaise: price, published },
-    });
-    const variantId = String(formData.get("variantId") ?? "");
-    const stock = Number(formData.get("stock"));
-    if (variantId) {
-      await prisma.productVariant.update({
-        where: { id: variantId },
-        data: { stock },
-      });
-    }
-    revalidatePath("/admin/products");
-  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="font-serif text-4xl">Catalog</h1>
-      <div className="mt-8 space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <h1 className="font-serif text-4xl">Catalog</h1>
+        <Link href="/admin/products/new" className="inline-flex min-h-11 items-center bg-[var(--forest)] px-5 text-[var(--ivory)]">
+          Add a drape
+        </Link>
+      </div>
+      <p className="mt-2 text-sm text-[var(--muted)]">Edit names, photos, price, and stock. New photos upload from each product page.</p>
+      <div className="mt-8 divide-y divide-[var(--line)] border border-[var(--line)]">
         {products.map((p) => (
-          <form key={p.id} action={save} className="grid gap-2 border border-[var(--line)] p-4 md:grid-cols-6 md:items-end">
-            <input type="hidden" name="id" value={p.id} />
-            <input type="hidden" name="variantId" value={p.variants[0]?.id ?? ""} />
-            <p className="md:col-span-2">
-              <span className="font-serif text-lg">{p.name}</span>
-              <span className="block text-xs text-[var(--muted)]">{p.sku}</span>
-            </p>
-            <label className="text-xs">
-              Price ₹
-              <input
-                name="price"
-                type="number"
-                defaultValue={Math.round(p.pricePaise / 100)}
-                className="mt-1 min-h-11 w-full border px-2"
-              />
-            </label>
-            <label className="text-xs">
-              Stock
-              <input
-                name="stock"
-                type="number"
-                defaultValue={p.variants[0]?.stock ?? 0}
-                className="mt-1 min-h-11 w-full border px-2"
-              />
-            </label>
-            <label className="flex min-h-11 items-center gap-2 text-sm">
-              <input type="checkbox" name="published" defaultChecked={p.published} /> Live
-            </label>
-            <button className="min-h-11 bg-[var(--maroon)] text-[var(--ivory)]">Save</button>
-            <p className="text-xs text-[var(--muted)] md:col-span-6">{formatInr(p.pricePaise)}</p>
-          </form>
+          <Link key={p.id} href={`/admin/products/${p.id}`} className="flex items-center gap-4 p-4 hover:bg-[var(--ivory-2)]">
+            <div className="h-16 w-12 shrink-0 bg-[var(--ivory-2)]">
+              {p.images[0] ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={p.images[0].url} alt="" className="h-16 w-12 object-cover" />
+              ) : null}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-serif text-lg">{p.name}</p>
+              <p className="text-xs text-[var(--muted)]">
+                {p.sku} · {p.published ? "Live" : "Hidden"} · stock {p.variants[0]?.stock ?? 0}
+              </p>
+            </div>
+            <p className="text-sm">{formatInr(p.pricePaise)}</p>
+          </Link>
         ))}
       </div>
     </div>

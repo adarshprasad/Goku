@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatInr } from "@/lib/utils";
+import { auth } from "@/auth";
 
 export default async function AdminHome() {
+  const session = await auth();
   const [sales, pending, low, orders] = await Promise.all([
     prisma.order.aggregate({
       _sum: { totalPaise: true },
@@ -16,36 +18,30 @@ export default async function AdminHome() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="font-serif text-4xl">Atelier desk</h1>
-      <nav className="mt-4 flex flex-wrap gap-4 text-sm">
-        <Link href="/admin/products" className="underline">
-          Catalog
-        </Link>
-        <Link href="/admin/orders" className="underline">
-          Orders
-        </Link>
-        <Link href="/admin/coupons" className="underline">
-          Coupons
-        </Link>
-      </nav>
+      <p className="mt-2 text-sm text-[var(--muted)]">
+        Signed in as {session?.user?.email}. Change the name, logo, photographs, catalog, and copy from the links above.
+      </p>
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         <div className="border border-[var(--line)] p-5">
-          <p className="text-xs uppercase tracking-widest">Sales captured</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--muted)]">Sales captured</p>
           <p className="mt-2 font-serif text-3xl">{formatInr(sales._sum.totalPaise ?? 0)}</p>
         </div>
         <div className="border border-[var(--line)] p-5">
-          <p className="text-xs uppercase tracking-widest">Pending COD</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--muted)]">Pending COD</p>
           <p className="mt-2 font-serif text-3xl">{pending}</p>
         </div>
         <div className="border border-[var(--line)] p-5">
-          <p className="text-xs uppercase tracking-widest">Low stock SKUs</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--muted)]">Low stock SKUs</p>
           <p className="mt-2 font-serif text-3xl">{low}</p>
         </div>
       </div>
-      <h2 className="mt-10 font-serif text-2xl">Recent orders</h2>
+      <h2 className="mt-12 font-serif text-2xl">Recent orders</h2>
       <ul className="mt-4 space-y-2 text-sm">
         {orders.map((o) => (
           <li key={o.id}>
-            {o.number} · {o.status} · {formatInr(o.totalPaise)}
+            <Link href="/admin/orders" className="hover:underline">
+              {o.number} · {o.status} · {formatInr(o.totalPaise)}
+            </Link>
           </li>
         ))}
       </ul>

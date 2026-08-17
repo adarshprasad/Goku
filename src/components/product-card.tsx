@@ -35,7 +35,7 @@ export function ProductCard({ product }: { product: ProductCardProduct }) {
           ) : null}
         </div>
         <div className="mt-3 space-y-1">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--gold-deep)]">{product.weave}</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--muted)]">{product.weave}</p>
           <h3 className="font-serif text-lg leading-snug">{product.name}</h3>
           <p className="text-sm">
             {formatInr(product.pricePaise)}

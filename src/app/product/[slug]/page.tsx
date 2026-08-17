@@ -5,7 +5,7 @@ import { addToCart, toggleWishlist } from "@/app/actions/cart";
 import { formatInr, discountPercent, waLink } from "@/lib/utils";
 import { PincodeCheck } from "@/components/pincode-check";
 import { ProductCard } from "@/components/product-card";
-import { brand, siteUrl } from "@/lib/brand";
+import { getBrand, siteUrl } from "@/lib/brand";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -31,7 +31,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     },
   });
   if (!product) notFound();
-  const addons = await prisma.addon.findMany();
+  const [addons, brand] = await Promise.all([prisma.addon.findMany(), getBrand()]);
   const stock = product.variants.reduce((s, v) => s + v.stock, 0);
   const off = discountPercent(product.pricePaise, product.mrpPaise);
   const jsonLd = {
@@ -62,7 +62,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           ))}
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--gold-deep)]">{product.weave}</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">{product.weave}</p>
           <h1 className="mt-2 font-serif text-4xl">{product.name}</h1>
           <p className="mt-4 text-xl">
             {formatInr(product.pricePaise)}
@@ -96,7 +96,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               <input type="hidden" name="variantId" value={product.variants[0]?.id ?? ""} />
             )}
             <fieldset>
-              <legend className="text-xs uppercase tracking-widest text-[var(--gold-deep)]">Atelier services</legend>
+              <legend className="text-xs uppercase tracking-widest text-[var(--muted)]">Atelier services</legend>
               {addons.map((a) => (
                 <label key={a.id} className="mt-2 flex min-h-11 items-center gap-2 text-sm">
                   <input type="checkbox" name="addons" value={a.slug} />
@@ -117,7 +117,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </form>
 
           <a
-            href={waLink(`I need help draping ${product.name}`)}
+            href={waLink(`I need help draping ${product.name}`, brand.whatsapp)}
             className="mt-4 inline-block text-sm underline"
           >
             Need help draping?

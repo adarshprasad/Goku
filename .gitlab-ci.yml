@@ -1,0 +1,58 @@
+# GitLab CI: install, test, build. This does NOT host the live shop.
+# GitLab Pages cannot run this Next.js app (it needs a Node server + database).
+# After CI is green, deploy the image or connect the GitLab repo to Render / Railway / Fly / a VPS.
+
+stages:
+  - test
+  - build
+
+node:22:
+  image: node:22-bookworm
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - node_modules/
+
+test:
+  stage: test
+  image: node:22-bookworm
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+  script:
+    - npm ci
+    - npm test
+    - npx tsc --noEmit
+    - npm run lint
+
+build:
+  stage: build
+  image: node:22-bookworm
+  needs: ["test"]
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+  variables:
+    DATABASE_URL: "file:./dev.db"
+    AUTH_SECRET: "ci-build-secret-not-for-production"
+    AUTH_URL: "http://localhost:3000"
+    NEXTAUTH_URL: "http://localhost:3000"
+    NEXTAUTH_SECRET: "ci-build-secret-not-for-production"
+  script:
+    - npm ci
+    - npx prisma generate
+    - npx prisma db push
+    - npm run build
+  artifacts:
+    paths:
+      - .next/
+    expire_in: 1 day

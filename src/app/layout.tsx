@@ -2,7 +2,7 @@ import { Cormorant_Garamond, Outfit } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SiteHeader, SiteFooter, BottomNav, WhatsAppButton } from "@/components/chrome";
-import { brand, siteUrl } from "@/lib/brand";
+import { getBrand, siteUrl } from "@/lib/brand";
 
 const serif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -15,28 +15,36 @@ const sans = Outfit({
   variable: "--font-sans",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: `${brand.name} — ${brand.taglineEn}`,
-    template: `%s · ${brand.name}`,
-  },
-  description: brand.description,
-  manifest: "/manifest.webmanifest",
-  appleWebApp: {
-    capable: true,
-    title: brand.name,
-    statusBarStyle: "default",
-  },
-  openGraph: {
-    title: brand.name,
+export async function generateMetadata(): Promise<Metadata> {
+  const brand = await getBrand();
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: `${brand.name} — ${brand.taglineEn}`,
+      template: `%s · ${brand.name}`,
+    },
     description: brand.description,
-    type: "website",
-  },
-};
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      title: brand.name,
+      statusBarStyle: "black-translucent",
+    },
+    icons: {
+      icon: brand.logo,
+      apple: brand.logo,
+    },
+    openGraph: {
+      title: brand.name,
+      description: brand.description,
+      type: "website",
+      images: [brand.logo],
+    },
+  };
+}
 
 export const viewport: Viewport = {
-  themeColor: "#6b1d2a",
+  themeColor: "#284232",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -46,7 +54,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={`${serif.variable} ${sans.variable} antialiased`}>
-        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-3 focus:py-2">
+        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-[var(--ivory)] focus:px-3 focus:py-2">
           Skip to content
         </a>
         <SiteHeader />

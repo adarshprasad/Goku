@@ -387,16 +387,16 @@ const products: SeedProduct[] = [
     collections: ["everyday"], photo: 2,
   },
   {
-    slug: "huduku-gift-card",
-    sku: "HDK-GFT-024",
-    name: "Huduku Gift Card — ₹5,000",
+    slug: "tavaru-gift-card",
+    sku: "TAVARU-GC-5000",
+    name: "Tavaru Gift Card — ₹5,000",
     type: "Gift card",
     description:
       "A digital atelier credit. Perfect when you know her taste is better than your guess. Delivered by email.",
-    craftStory: "Redeemable on any Huduku drape, blouse, or finishing service.",
+    craftStory: "Redeemable on any Tavaru drape, blouse, or finishing service.",
     price: 5000, mrp: 5000,
     weave: "Designer", fabric: "Digital", work: "None", occasion: "Casual",
-    color: "Maroon", motif: "Wordmark", border: "n/a", pallu: "n/a",
+    color: "Forest", motif: "Wordmark", border: "n/a", pallu: "n/a",
     lengthMeters: 0, blousePiece: false, weightFeel: "Light", care: "n/a", stock: 99,
     collections: ["new-in"], photo: 3,
   },
@@ -445,7 +445,7 @@ async function main() {
   await prisma.user.create({
     data: {
       email: "admin@huduku.in",
-      name: "Huduku Atelier",
+      name: "Tavaru Atelier",
       passwordHash: adminHash,
       role: "ADMIN",
       phone: "+918045672100",
@@ -596,7 +596,7 @@ async function main() {
         authorName: "Divya S",
         rating: 4,
         title: "Light as claimed",
-        body: "True to the mist grey on screen. Needed a lined blouse, which Huduku stitched in five days.",
+        body: "True to the mist grey on screen. Needed a lined blouse, which Tavaru stitched in five days.",
         verified: true,
       },
     ],
@@ -608,14 +608,14 @@ async function main() {
         slug: "how-to-drape-a-kanjivaram",
         title: "How to drape a Kanjivaram so the korvai shows",
         excerpt: "Temple borders deserve a 1.5-pleat start and a pallu that sits on the left shoulder, not the arm.",
-        body: "Start with a well-tucked first turn at the right waist. Keep pleats no wider than three fingers so the checks stay graphic. The korvai join should sit just below the blouse hem — that is the craft, not a seam to hide.\n\nHuduku’s pre-pleating service locks this geometry if you would rather walk into the hall already finished.",
+        body: "Start with a well-tucked first turn at the right waist. Keep pleats no wider than three fingers so the checks stay graphic. The korvai join should sit just below the blouse hem — that is the craft, not a seam to hide.\n\nTavaru’s pre-pleating service locks this geometry if you would rather walk into the hall already finished.",
         image: img(photos[1], "j=drape"),
       },
       {
         slug: "banarasi-kadhua-vs-cutwork",
         title: "Kadhua or cutwork: reading a Banarasi",
         excerpt: "Turn the saree over. If the motif is as finished on the reverse, you are holding kadhua.",
-        body: "Cutwork clips extra weft; kadhua weaves each flower independently. The latter costs time and therefore gold. At Huduku we label both honestly — including when a piece is powerloom with hand finishing.",
+        body: "Cutwork clips extra weft; kadhua weaves each flower independently. The latter costs time and therefore gold. At Tavaru we label both honestly — including when a piece is powerloom with hand finishing.",
         image: img(photos[0], "j=kadhua"),
       },
       {
@@ -648,7 +648,7 @@ async function main() {
     ],
   });
 
-  console.log("Seeded Huduku atelier. Admin admin@huduku.in / huduku-admin");
+  console.log("Seeded Tavaru atelier. Admin admin@huduku.in / huduku-admin");
 }
 
 main()

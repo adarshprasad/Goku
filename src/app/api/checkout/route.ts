@@ -6,7 +6,7 @@ import { getOrCreateCart, cartTotals } from "@/lib/cart";
 import { applyCoupon, type CouponInput } from "@/lib/coupons";
 import { COD_FEE_PAISE, codEligible, shippingForPincode, gstRateForApparel } from "@/lib/money";
 import { decrementStockAndMarkPaid } from "@/lib/orders";
-import { brand } from "@/lib/brand";
+import { getBrand } from "@/lib/brand";
 
 const checkoutSchema = z.object({
   email: z.string().email(),
@@ -32,6 +32,7 @@ function nextOrderNumber() {
 }
 
 export async function POST(req: NextRequest) {
+  const brand = await getBrand();
   const json = await req.json().catch(() => null);
   const parsed = checkoutSchema.safeParse(json);
   if (!parsed.success) {

@@ -15,7 +15,9 @@ export default async function AdminOrders() {
     const session = await auth();
     const id = String(formData.get("id"));
     const status = String(formData.get("status"));
-    await prisma.order.update({ where: { id }, data: { status } });
+    const trackingNumber = String(formData.get("trackingNumber") || "") || null;
+    const trackingUrl = String(formData.get("trackingUrl") || "") || null;
+    await prisma.order.update({ where: { id }, data: { status, trackingNumber, trackingUrl } });
     await prisma.orderEvent.create({
       data: { orderId: id, type: "STATUS", message: `Status → ${status}` },
     });
@@ -45,12 +47,24 @@ export default async function AdminOrders() {
                   {o.email} · {o.paymentMethod} · {o.paymentStatus} · {formatInr(o.totalPaise)}
                 </p>
               </div>
-              <select name="status" defaultValue={o.status} className="min-h-11 border px-2">
+              <select name="status" defaultValue={o.status} className="min-h-11 border border-[var(--line)] px-2">
                 {["PENDING", "PAID", "CONFIRMED", "PACKED", "SHIPPED", "DELIVERED", "CANCELLED", "RETURNED"].map((s) => (
                   <option key={s}>{s}</option>
                 ))}
               </select>
-              <button className="min-h-11 border px-4">Update</button>
+              <input
+                name="trackingNumber"
+                defaultValue={o.trackingNumber ?? ""}
+                placeholder="Tracking no."
+                className="min-h-11 border border-[var(--line)] px-2"
+              />
+              <input
+                name="trackingUrl"
+                defaultValue={o.trackingUrl ?? ""}
+                placeholder="Tracking URL"
+                className="min-h-11 min-w-[12rem] border border-[var(--line)] px-2"
+              />
+              <button className="min-h-11 border border-[var(--line)] px-4">Update</button>
             </div>
           </form>
         ))}

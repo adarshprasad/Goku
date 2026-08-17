@@ -1,19 +1,17 @@
-import { brand } from "@/lib/brand";
+import Image from "next/image";
+import { getBrand } from "@/lib/brand";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const brand = await getBrand();
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12">
-      <p className="text-xs uppercase tracking-[0.22em] text-[var(--gold-deep)]">{brand.taglineKn}</p>
-      <h1 className="mt-3 font-serif text-5xl">Huduku atelier</h1>
-      <p className="mt-6 text-lg leading-relaxed text-[var(--muted)]">
-        Huduku means to seek. We seek weaves with a place of origin — and finishing that respects them. The studio sits on
-        Lavelle Road, Bengaluru: fall, pico, blouse, and a quiet room to drape before a wedding.
-      </p>
-      <p className="mt-4 leading-relaxed text-[var(--muted)]">
-        We work with GI clusters in Varanasi, Kanchipuram, Chanderi, and Paithan. Powerloom is labelled. Gold is antique where
-        the loom allows. Returns are seven days on unused, unstitched pieces; stitched blouses and custom pallus stay with you.
-      </p>
-      <address className="mt-10 not-italic text-sm">
+    <div className="mx-auto max-w-3xl px-4 py-16">
+      <div className="bg-[var(--forest)] p-8">
+        <Image src={brand.logo} alt={brand.name} width={120} height={120} className="h-[120px] w-[120px] object-cover" />
+      </div>
+      <p className="mt-10 font-serif text-lg italic text-[var(--muted)]">{brand.taglineEn}</p>
+      <h1 className="mt-3 font-serif text-5xl">{brand.aboutTitle}</h1>
+      <div className="mt-8 whitespace-pre-line text-lg leading-relaxed text-[var(--muted)]">{brand.aboutBody}</div>
+      <address className="mt-12 not-italic text-sm leading-relaxed">
         {brand.address}
         <br />
         {brand.supportEmail} · {brand.supportPhone}

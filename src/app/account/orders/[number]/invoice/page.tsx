@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { brand } from "@/lib/brand";
+import { getBrand } from "@/lib/brand";
 import { formatInr } from "@/lib/utils";
 import { notFound, redirect } from "next/navigation";
 
@@ -15,6 +15,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ number
   if (!order || (order.userId && order.userId !== session.user.id && session.user.role !== "ADMIN")) {
     notFound();
   }
+  const brand = await getBrand();
 
   return (
     <div className="mx-auto max-w-2xl bg-white px-6 py-12 print:p-0">

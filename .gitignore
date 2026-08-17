@@ -38,6 +38,10 @@ yarn-error.log*
 prisma/*.db
 prisma/*.db-journal
 
+# admin uploads (kept on the shop machine)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
 # vercel
 .vercel
 

@@ -77,7 +77,7 @@ export function CheckoutForm({ email, defaultAddress, subtotalLabel }: CheckoutF
         key: data.key,
         amount: data.amount ?? 0,
         orderId: data.razorpayOrderId,
-        name: data.name ?? "Huduku",
+        name: data.name ?? "Tavaru",
         email: payload.email,
         phone: payload.phone,
         successPath: `/checkout/success?order=${data.number}`,
@@ -150,7 +150,7 @@ export function CheckoutForm({ email, defaultAddress, subtotalLabel }: CheckoutF
         </label>
       </fieldset>
       <fieldset className="space-y-2">
-        <legend className="text-xs uppercase tracking-widest text-[var(--gold-deep)]">Pay</legend>
+        <legend className="text-xs uppercase tracking-widest text-[var(--muted)]">Pay</legend>
         <label className="flex min-h-11 items-center gap-2">
           <input type="radio" name="method" value="RAZORPAY" defaultChecked />
           UPI / cards / netbanking (Razorpay — mock if keys missing)
@@ -160,7 +160,7 @@ export function CheckoutForm({ email, defaultAddress, subtotalLabel }: CheckoutF
           Cash on delivery (India, eligible pincodes, ₹49 fee)
         </label>
       </fieldset>
-      {mockNotice ? <p className="text-sm text-[var(--gold-deep)]">{mockNotice}</p> : null}
+      {mockNotice ? <p className="text-sm text-[var(--muted)]">{mockNotice}</p> : null}
       {error ? <p className="text-sm text-red-800">{error}</p> : null}
       <button
         disabled={pending}

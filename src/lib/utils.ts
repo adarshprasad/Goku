@@ -18,8 +18,8 @@ export function discountPercent(pricePaise: number, mrpPaise: number) {
   return Math.round(((mrpPaise - pricePaise) / mrpPaise) * 100);
 }
 
-export function waLink(text?: string) {
-  const phone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "918045672100";
+export function waLink(text?: string, phone?: string) {
+  const n = phone ?? process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "918045672100";
   const q = text ? `?text=${encodeURIComponent(text)}` : "";
-  return `https://wa.me/${phone}${q}`;
+  return `https://wa.me/${n}${q}`;
 }
