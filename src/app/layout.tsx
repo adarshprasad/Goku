@@ -28,15 +28,20 @@ export const metadata: Metadata = {
     title: brand.name,
     statusBarStyle: "default",
   },
+  icons: {
+    icon: brand.logo,
+    apple: brand.logo,
+  },
   openGraph: {
     title: brand.name,
     description: brand.description,
     type: "website",
+    images: [brand.logo],
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#6b1d2a",
+  themeColor: "#284232",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

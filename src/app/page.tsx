@@ -33,11 +33,19 @@ export default async function HomePage() {
           />
         ) : null}
         <div className="relative mx-auto flex min-h-[72vh] max-w-6xl flex-col justify-end px-4 py-16">
-          <p className="text-xs uppercase tracking-[0.28em] text-[var(--gold)]">{brand.taglineKn}</p>
+          <Image
+            src={brand.logo}
+            alt={brand.name}
+            width={160}
+            height={160}
+            className="mb-6 h-28 w-28 rounded-sm object-cover md:h-40 md:w-40"
+            priority
+          />
+          <p className="text-xs uppercase tracking-[0.28em] text-[var(--gold)]">{brand.taglineEn}</p>
           <h1 className="mt-4 max-w-2xl font-serif text-5xl leading-[1.1] md:text-7xl">
             {brand.name}
             <span className="mt-3 block font-sans text-lg font-normal tracking-normal text-[var(--ivory)]/80 md:text-xl">
-              {brand.taglineEn}. Handloom, temple borders, and finishing — from a Bengaluru atelier.
+              Handloom, temple borders, and finishing — from a Bengaluru atelier.
             </span>
           </h1>
           <div className="mt-8 flex flex-wrap gap-3">

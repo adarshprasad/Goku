@@ -1,6 +1,6 @@
-# Huduku phone app (5 minutes)
+# Tavaru phone app (5 minutes)
 
-This is a **thin Expo app**: it opens your live Huduku website inside a real app shell (Android + iPhone).  
+This is a **thin Expo app**: it opens your live Tavaru website inside a real app shell (Android + iPhone).  
 It is **not** a second catalog. Same products, cart, Razorpay, admin.
 
 Play Store / App Store submission is **not** 5 minutes. **Expo Go** on your phone is.

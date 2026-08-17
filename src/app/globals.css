@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --maroon: #6b1d2a;
-  --maroon-deep: #4a1018;
-  --ivory: #f7f1e8;
-  --ivory-2: #efe6d6;
-  --gold: #c4a574;
-  --gold-deep: #8c6a3a;
-  --ink: #1c1412;
-  --muted: #6b5e56;
-  --line: #e4d8c8;
+  --maroon: #284232;
+  --maroon-deep: #1c3024;
+  --ivory: #f7f4ea;
+  --ivory-2: #efe8d6;
+  --gold: #d1c792;
+  --gold-deep: #a89862;
+  --ink: #1a241c;
+  --muted: #5c665e;
+  --line: #ddd6c4;
   --background: var(--ivory);
   --foreground: var(--ink);
 }
@@ -45,8 +45,8 @@ h3,
 }
 
 ::selection {
-  background: #6b1d2a;
-  color: #f7f1e8;
+  background: #284232;
+  color: #d1c792;
 }
 
 .safe-bottom {

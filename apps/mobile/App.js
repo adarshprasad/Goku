@@ -61,8 +61,8 @@ export default function App() {
       <SafeAreaView style={styles.safe}>
         <StatusBar style="light" />
         <View style={styles.setup}>
-          <Text style={styles.brand}>Huduku</Text>
-          <Text style={styles.tag}>Open your shop</Text>
+          <Text style={styles.brand}>Tavaru</Text>
+          <Text style={styles.tag}>For the days that become photographs.</Text>
           <Text style={styles.hint}>
             Same Wi‑Fi as the Fedora box: http://192.168.29.238:3000{"\n"}
             Off Wi‑Fi: paste your https://….trycloudflare.com link
@@ -89,7 +89,7 @@ export default function App() {
     <SafeAreaView style={styles.safe}>
       <StatusBar style="light" />
       <View style={styles.bar}>
-        <Text style={styles.brandSmall}>Huduku</Text>
+        <Text style={styles.brandSmall}>Tavaru</Text>
         <Pressable onPress={() => setSetup(true)} hitSlop={12}>
           <Text style={styles.change}>Change URL</Text>
         </Pressable>
@@ -115,13 +115,13 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#6b1d2a" },
-  center: { flex: 1, backgroundColor: "#6b1d2a", justifyContent: "center" },
+  safe: { flex: 1, backgroundColor: "#284232" },
+  center: { flex: 1, backgroundColor: "#284232", justifyContent: "center" },
   setup: { padding: 24, gap: 12 },
-  brand: { color: "#f7f1e8", fontSize: 32, fontWeight: "600" },
-  brandSmall: { color: "#f7f1e8", fontSize: 18, fontWeight: "600" },
-  tag: { color: "#c4a574", fontSize: 16 },
-  hint: { color: "#efe6d6", fontSize: 13, lineHeight: 20, marginVertical: 8 },
+  brand: { color: "#D1C792", fontSize: 32, fontWeight: "600" },
+  brandSmall: { color: "#D1C792", fontSize: 18, fontWeight: "600" },
+  tag: { color: "#d1c792", fontSize: 16 },
+  hint: { color: "#efe8d6", fontSize: 13, lineHeight: 20, marginVertical: 8 },
   input: {
     minHeight: 48,
     backgroundColor: "#f7f1e8",
@@ -129,8 +129,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 4,
   },
-  btn: { backgroundColor: "#c4a574", minHeight: 48, justifyContent: "center", alignItems: "center" },
-  btnText: { color: "#4a1018", fontWeight: "700" },
+  btn: { backgroundColor: "#D1C792", minHeight: 48, justifyContent: "center", alignItems: "center" },
+  btnText: { color: "#1c3024", fontWeight: "700" },
   bar: {
     paddingHorizontal: 16,
     paddingVertical: 10,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  change: { color: "#c4a574", fontSize: 13 },
+  change: { color: "#D1C792", fontSize: 13 },
   web: { flex: 1, backgroundColor: "#f7f1e8" },
   overlay: {
     ...StyleSheet.absoluteFillObject,

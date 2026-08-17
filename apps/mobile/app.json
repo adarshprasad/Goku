@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Huduku",
-    "slug": "huduku",
+    "name": "Tavaru",
+    "slug": "tavaru",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "scheme": "huduku",
+    "scheme": "tavaru",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "in.huduku.app"
@@ -14,7 +14,7 @@
       "package": "in.huduku.app",
       "usesCleartextTraffic": true,
       "adaptiveIcon": {
-        "backgroundColor": "#6b1d2a"
+        "backgroundColor": "#284232"
       }
     },
     "plugins": [

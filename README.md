@@ -1,8 +1,10 @@
-# Huduku
+# Tavaru
 
 Premium saree atelier storefront — Next.js, Prisma (SQLite locally / Postgres in production), Razorpay (or labeled mock gateway), admin desk, PWA.
 
-**Hennige anda seere inda** — adds beauty to the woman.
+**For the days that become photographs.**
+
+Forest green `#284232` · champagne gold `#D1C792`. Logo: `public/brand/tavaru-logo.png`.
 
 ## Phone app in ~5 minutes
 
@@ -111,4 +113,6 @@ Price/tax/coupon unit tests live in `src/lib/*.test.ts`.
 
 ## Brand
 
-Huduku, Lavelle Road, Bengaluru. GSTIN and WhatsApp are env-driven — see `.env.example`.
+Tavaru, Lavelle Road, Bengaluru. GSTIN and WhatsApp are env-driven — see `.env.example`.
+
+After pulling this rebrand on the Fedora box: `git pull`, `npm run build`, restart `npm start`. Do **not** run `npm run db:seed` — that wipes orders. Demo logins stay `admin@huduku.in` / `huduku-admin`.

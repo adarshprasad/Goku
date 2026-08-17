@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { brand } from "@/lib/brand";
 import { auth } from "@/auth";
@@ -29,10 +30,20 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[var(--ivory)]/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-        <Link href="/" className="min-h-11 min-w-11">
-          <span className="font-serif text-2xl tracking-tight text-[var(--maroon)]">{brand.name}</span>
-          <span className="mt-0.5 block text-[10px] uppercase tracking-[0.22em] text-[var(--gold-deep)]">
-            Bengaluru atelier
+        <Link href="/" className="flex min-h-11 items-center gap-3">
+          <Image
+            src={brand.logo}
+            alt={brand.name}
+            width={56}
+            height={56}
+            className="h-14 w-14 rounded-sm object-cover"
+            priority
+          />
+          <span>
+            <span className="block font-serif text-2xl tracking-tight text-[var(--maroon)]">{brand.name}</span>
+            <span className="mt-0.5 block text-[10px] uppercase tracking-[0.18em] text-[var(--gold-deep)]">
+              Bengaluru atelier
+            </span>
           </span>
         </Link>
         <nav className="hidden items-center gap-6 md:flex" aria-label="Primary">
@@ -73,9 +84,9 @@ export function SiteFooter() {
     <footer className="mt-20 border-t border-[var(--line)] bg-[#f3eadc] pb-24 md:pb-8">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-4">
         <div>
-          <p className="font-serif text-2xl text-[var(--maroon)]">{brand.name}</p>
-          <p className="mt-2 font-serif italic text-[var(--gold-deep)]">{brand.taglineKn}</p>
-          <p className="mt-1 text-sm text-[var(--muted)]">{brand.taglineEn}</p>
+          <Image src={brand.logo} alt={brand.name} width={96} height={96} className="h-24 w-24 rounded-sm object-cover" />
+          <p className="mt-3 font-serif text-2xl text-[var(--maroon)]">{brand.name}</p>
+          <p className="mt-2 font-serif italic text-[var(--gold-deep)]">{brand.taglineEn}</p>
         </div>
         <div>
           <p className="text-xs uppercase tracking-widest text-[var(--gold-deep)]">Visit</p>
@@ -123,7 +134,7 @@ export function BottomNav() {
 }
 
 export function WhatsAppButton() {
-  const href = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Namaskara, I would like help choosing a Huduku drape.")}`;
+  const href = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Namaskara, I would like help choosing a Tavaru drape.")}`;
   return (
     <a
       href={href}

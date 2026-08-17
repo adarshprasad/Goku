@@ -77,7 +77,7 @@ export function CheckoutForm({ email, defaultAddress, subtotalLabel }: CheckoutF
         key: data.key,
         amount: data.amount ?? 0,
         orderId: data.razorpayOrderId,
-        name: data.name ?? "Huduku",
+        name: data.name ?? "Tavaru",
         email: payload.email,
         phone: payload.phone,
         successPath: `/checkout/success?order=${data.number}`,
