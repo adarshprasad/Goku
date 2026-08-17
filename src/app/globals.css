@@ -1,15 +1,17 @@
 @import "tailwindcss";
 
 :root {
+  --forest: #284232;
+  --forest-deep: #1c3024;
   --maroon: #284232;
   --maroon-deep: #1c3024;
-  --ivory: #f7f4ea;
-  --ivory-2: #efe8d6;
-  --gold: #d1c792;
-  --gold-deep: #a89862;
+  --ivory: #f6f1e4;
+  --ivory-2: #ebe4d4;
+  --gold: #d8d0b8;
+  --gold-deep: #6a746c;
   --ink: #1a241c;
-  --muted: #5c665e;
-  --line: #ddd6c4;
+  --muted: #5a655c;
+  --line: #d4cbb8;
   --background: var(--ivory);
   --foreground: var(--ink);
 }
@@ -17,7 +19,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-maroon: var(--maroon);
+  --color-maroon: var(--forest);
+  --color-forest: var(--forest);
   --color-ivory: var(--ivory);
   --color-gold: var(--gold);
   --color-ink: var(--ink);
@@ -45,10 +48,16 @@ h3,
 }
 
 ::selection {
-  background: #284232;
-  color: #d1c792;
+  background: var(--forest);
+  color: var(--ivory);
 }
 
 .safe-bottom {
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+input,
+textarea,
+select {
+  accent-color: var(--forest);
 }

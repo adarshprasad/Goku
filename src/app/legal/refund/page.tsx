@@ -1,11 +1,11 @@
-export default function RefundPage() {
+import { getBrand } from "@/lib/brand";
+
+export default async function RefundPage() {
+  const brand = await getBrand();
   return (
-    <article className="mx-auto max-w-2xl px-4 py-12 text-[var(--muted)]">
+    <article className="mx-auto max-w-2xl px-4 py-16 text-[var(--muted)]">
       <h1 className="font-serif text-4xl text-[var(--ink)]">Refunds</h1>
-      <p className="mt-6">
-        Prepaid refunds return to the original gateway within 5–7 working days after QC. Store credit is available on request.
-        COD refunds are issued as UPI transfer after we receive the unused drape.
-      </p>
+      <p className="mt-6 whitespace-pre-line leading-relaxed">{brand.refundBody}</p>
     </article>
   );
 }

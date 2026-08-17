@@ -23,7 +23,7 @@ export default async function AccountPage() {
         <Link href="/account/returns" className="border border-[var(--line)] p-5">
           <h2 className="font-serif text-2xl">Returns</h2>
         </Link>
-        {session.user.role === "ADMIN" ? (
+        {session.user.role === "ADMIN" || session.user.role === "STAFF" ? (
           <Link href="/admin" className="border border-[var(--line)] p-5">
             <h2 className="font-serif text-2xl">Admin</h2>
           </Link>

@@ -18,7 +18,7 @@ export default async function SuccessPage({
 
   return (
     <div className="mx-auto max-w-lg px-4 py-16 text-center">
-      <p className="text-xs uppercase tracking-[0.22em] text-[var(--gold-deep)]">Namaskara</p>
+      <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">Namaskara</p>
       <h1 className="mt-3 font-serif text-4xl">Order {order.number}</h1>
       <p className="mt-4 text-[var(--muted)]">
         {order.paymentMethod === "COD"

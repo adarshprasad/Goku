@@ -29,15 +29,19 @@ export default async function LoginPage({
     <div className="mx-auto max-w-md px-4 py-16">
       <h1 className="font-serif text-4xl">Sign in</h1>
       <p className="mt-2 text-sm text-[var(--muted)]">
-        Demo customer <code>customer@huduku.in</code> / <code>huduku123</code>
+        Admin desk: <code>admin@huduku.in</code> / <code>huduku-admin</code> — then open Account → Admin, or{" "}
+        <a href="/admin" className="underline">
+          /admin
+        </a>
+        .
         <br />
-        Admin <code>admin@huduku.in</code> / <code>huduku-admin</code>
+        Demo customer <code>customer@huduku.in</code> / <code>huduku123</code>
       </p>
       <form action={login} className="mt-8 space-y-4">
         <input name="email" type="email" required placeholder="Email" className="min-h-11 w-full border border-[var(--line)] px-3" />
         <input name="password" type="password" required placeholder="Password" className="min-h-11 w-full border border-[var(--line)] px-3" />
         {sp.error ? <p className="text-sm text-red-800">Those credentials were not accepted.</p> : null}
-        <button className="min-h-12 w-full bg-[var(--maroon)] text-[var(--ivory)]">Continue</button>
+        <button className="min-h-12 w-full bg-[var(--forest)] text-[var(--ivory)]">Continue</button>
       </form>
       <p className="mt-6 text-sm">
         <Link href="/checkout" className="underline">

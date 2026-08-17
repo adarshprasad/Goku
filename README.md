@@ -113,6 +113,18 @@ Price/tax/coupon unit tests live in `src/lib/*.test.ts`.
 
 ## Brand
 
-Tavaru, Lavelle Road, Bengaluru. GSTIN and WhatsApp are env-driven — see `.env.example`.
+Tavaru, Lavelle Road, Bengaluru. Forest green `#284232` and ivory `#f6f1e4`.
 
-After pulling this rebrand on the Fedora box: `git pull`, `npm run build`, restart `npm start`. Do **not** run `npm run db:seed` — that wipes orders. Demo logins stay `admin@huduku.in` / `huduku-admin`.
+After pulling on the Fedora box: `git pull`, `npm run build`, restart `npm start`. Do **not** run `npm run db:seed` — that wipes orders. Demo logins stay `admin@huduku.in` / `huduku-admin`.
+
+## Admin (photos and copy)
+
+Sign in as admin, then open `/admin` (or Account → Admin).
+
+- **Brand & pages** — name, tagline, logo, contact, About, legal copy, home craft photo
+- **Catalog** — add/edit drapes, upload multiple photos, price, stock, collections
+- **Collections / Home banners / Journal** — text plus image upload
+- **Coupons / Orders** — pause codes, tracking numbers
+
+Uploads land in `public/uploads` (and logos in `public/brand`) on the machine that runs `npm start`.
+

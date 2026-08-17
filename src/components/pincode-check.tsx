@@ -28,7 +28,7 @@ export function PincodeCheck({ subtotalPaise }: { subtotalPaise: number }) {
 
   return (
     <div className="mt-4">
-      <label className="text-xs uppercase tracking-widest text-[var(--gold-deep)]" htmlFor="pin">
+      <label className="text-xs uppercase tracking-widest text-[var(--muted)]" htmlFor="pin">
         Delivery pincode
       </label>
       <div className="mt-2 flex gap-2">
