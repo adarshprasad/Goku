@@ -23,4 +23,9 @@ describe("normalizeSiteUrl", () => {
   it("keeps localhost on http", () => {
     expect(normalizeSiteUrl("http://localhost:3000")).toBe("http://localhost:3000");
   });
+
+  it("accepts the live shop host", () => {
+    expect(normalizeSiteUrl("tavaruseere.com")).toBe("https://tavaruseere.com");
+    expect(normalizeSiteUrl("https://www.tavaruseere.com/")).toBe("https://www.tavaruseere.com");
+  });
 });

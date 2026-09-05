@@ -45,7 +45,7 @@ export default async function AdminSettingsPage() {
           defaultValue={brand.siteUrl}
         />
         <p className="-mt-4 text-xs text-[var(--muted)]">
-          Example: https://www.your-shop.in — also set AUTH_URL, NEXTAUTH_URL, and NEXT_PUBLIC_SITE_URL to this same value in the server `.env`, then rebuild.
+          Example: https://tavaruseere.com — also set AUTH_URL, NEXTAUTH_URL, and NEXT_PUBLIC_SITE_URL in the server `.env`, then rebuild.
         </p>
         <Field name="description" label="SEO description" defaultValue={brand.description} textarea />
         <Field name="heroSubtitle" label="Home hero line" defaultValue={brand.heroSubtitle} textarea />

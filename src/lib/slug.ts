@@ -17,7 +17,7 @@ export function filesFromForm(formData: FormData, name: string) {
     .filter((v): v is File => v instanceof File && v.size > 0);
 }
 
-export function normalizeSiteUrl(raw: string, fallback = "http://localhost:3000") {
+export function normalizeSiteUrl(raw: string, fallback = "https://tavaruseere.com") {
   const trimmed = raw.trim().replace(/\/+$/, "");
   if (!trimmed) return fallback;
   if (/^https?:\/\//i.test(trimmed)) return trimmed;

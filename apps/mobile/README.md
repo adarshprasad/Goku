@@ -20,7 +20,7 @@ Play Store / App Store submission is **not** 5 minutes. **Expo Go** on your phon
 ```bash
 cd apps/mobile
 npm install
-echo 'EXPO_PUBLIC_SITE_URL=https://YOUR-TRYCLOUDFLARE-OR-TAILSCALE-URL' > .env
+echo 'EXPO_PUBLIC_SITE_URL=https://tavaruseere.com' > .env
 npx expo start
 ```
 
@@ -32,7 +32,7 @@ If the phone is on **home Wi‑Fi**, this can work:
 EXPO_PUBLIC_SITE_URL=http://192.168.29.238:3000 npx expo start
 ```
 
-The phone and Fedora must be on the **same Wi‑Fi**. Off Wi‑Fi, use the `https://….trycloudflare.com` URL.
+The phone and Fedora must be on the **same Wi‑Fi**. Off Wi‑Fi, use **https://tavaruseere.com** once DNS points at the shop.
 
 ## Play Store later (not 5 minutes)
 

@@ -645,6 +645,7 @@ async function main() {
       { key: "freeShippingPaise", value: "800000" },
       { key: "enableCod", value: "true" },
       { key: "enableInternational", value: "false" },
+      { key: "siteUrl", value: "https://tavaruseere.com" },
     ],
   });
 
