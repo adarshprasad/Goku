@@ -1,5 +1,11 @@
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { normalizeSiteUrl } from "@/lib/slug";
+import { CANONICAL_SITE_URL, SUPPORT_EMAIL } from "@/lib/site";
+
+const envSiteUrl = normalizeSiteUrl(
+  process.env.NEXT_PUBLIC_SITE_URL || process.env.AUTH_URL || process.env.NEXTAUTH_URL || CANONICAL_SITE_URL,
+);
 
 export const brandDefaults = {
   name: "Tavaru",
@@ -8,14 +14,14 @@ export const brandDefaults = {
   description:
     "Tavaru is a premium Indian saree atelier — handloom Banarasi, Kanjivaram, Chanderi, organza, linen, and designer drapes, with blouses, lehengas, and finishing services.",
   logo: "/brand/tavaru-logo.png",
-  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "hello@tavaru.in",
+  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? SUPPORT_EMAIL,
   supportPhone: process.env.NEXT_PUBLIC_SUPPORT_PHONE ?? "+91 80 4567 2100",
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "918045672100",
   address:
     process.env.NEXT_PUBLIC_BUSINESS_ADDRESS ??
     "Tavaru Atelier, 12 Lavelle Road, Bengaluru, Karnataka 560001",
   gstin: process.env.NEXT_PUBLIC_GSTIN ?? "29AAAAA0000A1Z5",
-  instagram: "https://instagram.com/tavaru",
+  instagram: "https://instagram.com/tavaruseere",
   returnDays: "7",
   shippingIndia: "3–7 days across India",
   shippingIntl: "10–21 days for international orders",
@@ -36,6 +42,7 @@ export const brandDefaults = {
     "Prepaid refunds return to the original gateway within 5–7 working days after QC. Store credit is available on request. COD refunds are issued as UPI transfer after we receive the unused drape.",
   shippingPolicy:
     "Returns within the stated days for unused, unstitched pieces with tags. Stitched blouses, pre-pleating, and custom pallus are not returnable. COD orders may be refused at the door only if the packet is unopened; RTO fees may be deducted from refunds.",
+  siteUrl: envSiteUrl,
 } as const;
 
 export type SiteBrand = Record<keyof typeof brandDefaults, string>;
@@ -52,11 +59,15 @@ export const getBrand = cache(async (): Promise<SiteBrand> => {
     const v = map[key];
     if (typeof v === "string" && v.trim()) out[key] = v;
   }
+  out.siteUrl = normalizeSiteUrl(out.siteUrl || envSiteUrl);
   return out;
 });
 
-/** Static fallback for modules that cannot await (prefer getBrand()). */
-export const brand = brandDefaults;
+export async function getSiteUrl() {
+  const brand = await getBrand();
+  return normalizeSiteUrl(brand.siteUrl || envSiteUrl);
+}
 
-export const siteUrl =
-  process.env.NEXTAUTH_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+/** Sync fallback for modules that cannot await (prefer getBrand / getSiteUrl). */
+export const brand = brandDefaults;
+export const siteUrl = envSiteUrl;

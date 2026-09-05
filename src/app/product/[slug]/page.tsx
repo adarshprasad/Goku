@@ -5,7 +5,7 @@ import { addToCart, toggleWishlist } from "@/app/actions/cart";
 import { formatInr, discountPercent, waLink } from "@/lib/utils";
 import { PincodeCheck } from "@/components/pincode-check";
 import { ProductCard } from "@/components/product-card";
-import { getBrand, siteUrl } from "@/lib/brand";
+import { getBrand } from "@/lib/brand";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -46,7 +46,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       priceCurrency: "INR",
       price: (product.pricePaise / 100).toFixed(2),
       availability: stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      url: `${siteUrl}/product/${product.slug}`,
+      url: `${brand.siteUrl}/product/${product.slug}`,
     },
   };
 

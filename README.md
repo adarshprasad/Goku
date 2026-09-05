@@ -14,7 +14,7 @@ Do **not** expect Play Store in 5 minutes. Use **Expo Go**:
 cd apps/mobile
 npm install
 # URL that already opens the shop in your phone browser:
-echo 'EXPO_PUBLIC_SITE_URL=https://YOUR-PUBLIC-SHOP-URL' > .env
+echo 'EXPO_PUBLIC_SITE_URL=https://tavaruseere.com' > .env
 npx expo start
 ```
 
@@ -64,16 +64,16 @@ Then visit `http://localhost:3000`. Admin: `admin@huduku.in` / `huduku-admin`.
 DATABASE_URL=postgresql://...
 AUTH_SECRET=<openssl rand -base64 32>
 NEXTAUTH_SECRET=<same as AUTH_SECRET>
-AUTH_URL=https://your-domain.com
-NEXTAUTH_URL=https://your-domain.com
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
+AUTH_URL=https://tavaruseere.com
+NEXTAUTH_URL=https://tavaruseere.com
+NEXT_PUBLIC_SITE_URL=https://tavaruseere.com
 ```
 
 5. Build command: `npx prisma generate && npx prisma db push && npm run db:seed && npm run build`  
    Start command: `npm start`  
    (Seed only the first time, or you will wipe orders.)
 
-6. Optional: add Razorpay keys and set the webhook URL to `https://your-domain.com/api/webhooks/razorpay`.
+6. Optional: add Razorpay keys and set the webhook URL to `https://tavaruseere.com/api/webhooks/razorpay`.
 
 GitLab CI (`.gitlab-ci.yml`) will **test and build** on every push. Use a host above to **run** the site. A `Dockerfile` is included if you prefer a container (Fly, Cloud Run, a VPS).
 
@@ -117,11 +117,33 @@ Tavaru, Lavelle Road, Bengaluru. Forest green `#284232` and ivory `#f6f1e4`.
 
 After pulling on the Fedora box: `git pull`, `npm run build`, restart `npm start`. Do **not** run `npm run db:seed` — that wipes orders. Demo logins stay `admin@huduku.in` / `huduku-admin`.
 
+## Your domain
+
+**https://tavaruseere.com** (`www.tavaruseere.com` is a CNAME to the apex).
+
+Set **the same URL** in three places:
+
+1. Fedora `~/huduku/.env`:
+
+```
+AUTH_URL=https://tavaruseere.com
+NEXTAUTH_URL=https://tavaruseere.com
+NEXT_PUBLIC_SITE_URL=https://tavaruseere.com
+NEXT_PUBLIC_SUPPORT_EMAIL=hello@tavaruseere.com
+```
+
+2. Admin → **Brand & pages** → Public website → `https://tavaruseere.com`
+3. Razorpay webhook: `https://tavaruseere.com/api/webhooks/razorpay`
+
+Then `npm run build` and restart `npm start`. Login/cookies will not work on the domain until AUTH_URL matches.
+
+The zone currently has an A record to `160.153.0.142` (GoDaddy). That IP must be the host that runs this Next.js shop, or you must change the A record (or Cloudflare proxy) to whatever actually serves `npm start`. The `_acme-challenge` CNAME is already set for Cloudflare SSL.
+
 ## Admin (photos and copy)
 
 Sign in as admin, then open `/admin` (or Account → Admin).
 
-- **Brand & pages** — name, tagline, logo, contact, About, legal copy, home craft photo
+- **Brand & pages** — domain, name, tagline, logo, contact, About, legal copy, home craft photo
 - **Catalog** — add/edit drapes, upload multiple photos, price, stock, collections
 - **Collections / Home banners / Journal** — text plus image upload
 - **Coupons / Orders** — pause codes, tracking numbers

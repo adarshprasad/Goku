@@ -5,6 +5,7 @@ import { requireStaff } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { saveUpload } from "@/lib/uploads";
 import { brandDefaults, type SiteBrand } from "@/lib/brand";
+import { normalizeSiteUrl } from "@/lib/slug";
 
 const TEXT_KEYS = Object.keys(brandDefaults) as (keyof SiteBrand)[];
 
@@ -34,10 +35,11 @@ export async function saveSiteSettings(formData: FormData) {
     }
     const raw = formData.get(key);
     if (typeof raw !== "string") continue;
+    const value = key === "siteUrl" ? normalizeSiteUrl(raw) : raw;
     await prisma.setting.upsert({
       where: { key },
-      update: { value: raw },
-      create: { key, value: raw },
+      update: { value },
+      create: { key, value },
     });
   }
 

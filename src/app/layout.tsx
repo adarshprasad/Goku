@@ -2,7 +2,7 @@ import { Cormorant_Garamond, Outfit } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SiteHeader, SiteFooter, BottomNav, WhatsAppButton } from "@/components/chrome";
-import { getBrand, siteUrl } from "@/lib/brand";
+import { getBrand } from "@/lib/brand";
 
 const serif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -18,7 +18,7 @@ const sans = Outfit({
 export async function generateMetadata(): Promise<Metadata> {
   const brand = await getBrand();
   return {
-    metadataBase: new URL(siteUrl),
+    metadataBase: new URL(brand.siteUrl),
     title: {
       default: `${brand.name} — ${brand.taglineEn}`,
       template: `%s · ${brand.name}`,
