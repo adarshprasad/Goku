@@ -117,11 +117,28 @@ Tavaru, Lavelle Road, Bengaluru. Forest green `#284232` and ivory `#f6f1e4`.
 
 After pulling on the Fedora box: `git pull`, `npm run build`, restart `npm start`. Do **not** run `npm run db:seed` — that wipes orders. Demo logins stay `admin@huduku.in` / `huduku-admin`.
 
+## Your domain
+
+Point DNS (A or CNAME) at the machine that runs the shop, with HTTPS (Caddy, nginx, or Cloudflare). Then set **the same URL** in three places:
+
+1. Fedora `~/huduku/.env`:
+
+```
+AUTH_URL=https://YOUR-DOMAIN
+NEXTAUTH_URL=https://YOUR-DOMAIN
+NEXT_PUBLIC_SITE_URL=https://YOUR-DOMAIN
+```
+
+2. Admin → **Brand & pages** → Public website (same `https://YOUR-DOMAIN`)
+3. Razorpay webhook: `https://YOUR-DOMAIN/api/webhooks/razorpay`
+
+Then `npm run build` and restart `npm start`. Login/cookies will not work on the domain until AUTH_URL matches.
+
 ## Admin (photos and copy)
 
 Sign in as admin, then open `/admin` (or Account → Admin).
 
-- **Brand & pages** — name, tagline, logo, contact, About, legal copy, home craft photo
+- **Brand & pages** — domain, name, tagline, logo, contact, About, legal copy, home craft photo
 - **Catalog** — add/edit drapes, upload multiple photos, price, stock, collections
 - **Collections / Home banners / Journal** — text plus image upload
 - **Coupons / Orders** — pause codes, tracking numbers

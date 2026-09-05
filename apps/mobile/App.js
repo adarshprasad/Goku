@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { WebView } from "react-native-webview";
 
 const KEY = "huduku_shop_url";
-const DEFAULT_URL = "http://192.168.29.238:3000";
+const DEFAULT_URL = process.env.EXPO_PUBLIC_SITE_URL || "http://localhost:3000";
 
 function normalize(raw) {
   const u = raw.trim().replace(/\/$/, "");
@@ -64,8 +64,8 @@ export default function App() {
           <Text style={styles.brand}>Tavaru</Text>
           <Text style={styles.tag}>For the days that become photographs.</Text>
           <Text style={styles.hint}>
-            Same Wi‑Fi as the Fedora box: http://192.168.29.238:3000{"\n"}
-            Off Wi‑Fi: paste your https://….trycloudflare.com link
+            Paste your shop domain (https://www.your-shop.in){"\n"}
+            Same Wi‑Fi as the Fedora box: http://192.168.29.238:3000
           </Text>
           <TextInput
             value={draft}

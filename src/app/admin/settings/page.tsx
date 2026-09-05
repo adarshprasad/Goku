@@ -39,6 +39,14 @@ export default async function AdminSettingsPage() {
           <Field name="name" label="Shop name" defaultValue={brand.name} />
           <Field name="taglineEn" label="Tagline" defaultValue={brand.taglineEn} />
         </div>
+        <Field
+          name="siteUrl"
+          label="Public website (your domain)"
+          defaultValue={brand.siteUrl}
+        />
+        <p className="-mt-4 text-xs text-[var(--muted)]">
+          Example: https://www.your-shop.in — also set AUTH_URL, NEXTAUTH_URL, and NEXT_PUBLIC_SITE_URL to this same value in the server `.env`, then rebuild.
+        </p>
         <Field name="description" label="SEO description" defaultValue={brand.description} textarea />
         <Field name="heroSubtitle" label="Home hero line" defaultValue={brand.heroSubtitle} textarea />
         <label className="block text-sm">

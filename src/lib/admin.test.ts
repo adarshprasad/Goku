@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { slugify } from "./slug";
+import { slugify, normalizeSiteUrl } from "./slug";
 
 describe("slugify", () => {
   it("turns a product name into a url slug", () => {
@@ -8,5 +8,19 @@ describe("slugify", () => {
 
   it("falls back when empty", () => {
     expect(slugify("   ")).toBe("item");
+  });
+});
+
+describe("normalizeSiteUrl", () => {
+  it("adds https when the scheme is missing", () => {
+    expect(normalizeSiteUrl("shop.tavaru.example")).toBe("https://shop.tavaru.example");
+  });
+
+  it("strips a trailing slash", () => {
+    expect(normalizeSiteUrl("https://atelier.example/")).toBe("https://atelier.example");
+  });
+
+  it("keeps localhost on http", () => {
+    expect(normalizeSiteUrl("http://localhost:3000")).toBe("http://localhost:3000");
   });
 });
