@@ -26,6 +26,9 @@ export default async function AdminHome() {
         <Link href="/admin/coupons" className="underline">
           Coupons
         </Link>
+        <Link href="/admin/customers" className="underline">
+          Clients
+        </Link>
       </nav>
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         <div className="border border-[var(--line)] p-5">

@@ -40,6 +40,12 @@ export default async function LoginPage({
         <button className="min-h-12 w-full bg-[var(--maroon)] text-[var(--ivory)]">Continue</button>
       </form>
       <p className="mt-6 text-sm">
+        New here?{" "}
+        <Link href="/register" className="underline">
+          Create an account
+        </Link>
+      </p>
+      <p className="mt-3 text-sm">
         <Link href="/checkout" className="underline">
           Continue as guest at checkout
         </Link>

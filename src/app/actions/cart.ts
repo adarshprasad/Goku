@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getOrCreateCart } from "@/lib/cart";
 
@@ -57,6 +58,7 @@ export async function addToCart(formData: FormData): Promise<void> {
 
   revalidatePath("/cart");
   revalidatePath("/");
+  redirect("/cart");
 }
 
 export async function updateCartItem(formData: FormData): Promise<void> {

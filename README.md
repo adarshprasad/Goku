@@ -37,10 +37,12 @@ Stripe is gated behind `ENABLE_INTERNATIONAL=true`.
 ## Stack
 
 - Next.js 15 App Router, TypeScript, Tailwind
-- Auth.js credentials (Google optional)
+- Auth.js credentials (Google optional) + `/register`
 - Prisma + SQLite (`DATABASE_URL=file:./dev.db`). For production set a Postgres URL and change `provider` in `prisma/schema.prisma`
-- Admin at `/admin` (ADMIN / STAFF)
-- PWA: `public/manifest.webmanifest`
+- Admin at `/admin` (ADMIN / STAFF) — catalog, orders + AWB, coupons, clients
+- PWA: `public/manifest.webmanifest` + production service worker
+- Predictive search (⌘K / Search) and `/api/search`, `/api/catalog` for native apps
+- Guest order tracking at `/track`
 - Expo notes: `apps/mobile/README.md`
 
 ## Tests
@@ -49,7 +51,7 @@ Stripe is gated behind `ENABLE_INTERNATIONAL=true`.
 npm test
 ```
 
-Price/tax/coupon unit tests live in `src/lib/*.test.ts`.
+Price/tax/coupon/quote unit tests live in `src/lib/*.test.ts`.
 
 ## Brand
 

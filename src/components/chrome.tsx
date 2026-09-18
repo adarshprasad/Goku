@@ -3,6 +3,7 @@ import { brand } from "@/lib/brand";
 import { auth } from "@/auth";
 import { getCart } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
+import { SearchDialog } from "@/components/search-dialog";
 
 const nav = [
   { href: "/shop", label: "Shop" },
@@ -47,9 +48,7 @@ export async function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-3 text-sm">
-          <Link href="/shop?q=" className="hidden min-h-11 items-center sm:flex">
-            Search
-          </Link>
+          <SearchDialog />
           <Link href="/wishlist" className="min-h-11 min-w-11 inline-flex items-center">
             Wish{wish ? ` (${wish})` : ""}
           </Link>
@@ -86,7 +85,9 @@ export function SiteFooter() {
         <div className="flex flex-col gap-2 text-sm">
           <p className="text-xs uppercase tracking-widest text-[var(--gold-deep)]">Client care</p>
           <Link href="/support">Shipping & returns</Link>
-          <Link href="/account/orders">Track order</Link>
+          <Link href="/guide">Blouse & fabric guide</Link>
+          <Link href="/faq">FAQ</Link>
+          <Link href="/track">Track order</Link>
           <Link href="/legal/privacy">Privacy</Link>
           <Link href="/legal/terms">Terms</Link>
           <Link href="/legal/refund">Refunds</Link>
@@ -105,6 +106,7 @@ export function BottomNav() {
   const items = [
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
+    { href: "/track", label: "Track" },
     { href: "/wishlist", label: "Wish" },
     { href: "/account", label: "Account" },
   ];

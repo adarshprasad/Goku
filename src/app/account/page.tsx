@@ -17,6 +17,12 @@ export default async function AccountPage() {
           <h2 className="font-serif text-2xl">Orders</h2>
           <p className="text-sm text-[var(--muted)]">{orders} placed</p>
         </Link>
+        <Link href="/account/addresses" className="border border-[var(--line)] p-5">
+          <h2 className="font-serif text-2xl">Addresses</h2>
+        </Link>
+        <Link href="/track" className="border border-[var(--line)] p-5">
+          <h2 className="font-serif text-2xl">Track</h2>
+        </Link>
         <Link href="/wishlist" className="border border-[var(--line)] p-5">
           <h2 className="font-serif text-2xl">Wishlist</h2>
         </Link>

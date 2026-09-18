@@ -15,7 +15,12 @@ export default async function AdminOrders() {
     const session = await auth();
     const id = String(formData.get("id"));
     const status = String(formData.get("status"));
-    await prisma.order.update({ where: { id }, data: { status } });
+    const trackingNumber = String(formData.get("trackingNumber") ?? "").trim() || null;
+    const trackingUrl = String(formData.get("trackingUrl") ?? "").trim() || null;
+    await prisma.order.update({
+      where: { id },
+      data: { status, trackingNumber, trackingUrl },
+    });
     await prisma.orderEvent.create({
       data: { orderId: id, type: "STATUS", message: `Status → ${status}` },
     });
@@ -52,6 +57,23 @@ export default async function AdminOrders() {
               </select>
               <button className="min-h-11 border px-4">Update</button>
             </div>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <input
+                name="trackingNumber"
+                defaultValue={o.trackingNumber ?? ""}
+                placeholder="AWB / tracking number"
+                className="min-h-11 border px-2 text-sm"
+              />
+              <input
+                name="trackingUrl"
+                defaultValue={o.trackingUrl ?? ""}
+                placeholder="Carrier URL"
+                className="min-h-11 border px-2 text-sm"
+              />
+            </div>
+            <p className="mt-2 text-xs text-[var(--muted)]">
+              {o.items.map((i) => `${i.name} × ${i.quantity}`).join(" · ")} · {o.shippingCity} {o.shippingPincode}
+            </p>
           </form>
         ))}
       </div>

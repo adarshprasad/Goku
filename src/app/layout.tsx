@@ -2,6 +2,7 @@ import { Cormorant_Garamond, Outfit } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SiteHeader, SiteFooter, BottomNav, WhatsAppButton } from "@/components/chrome";
+import { PwaRegister } from "@/components/pwa-register";
 import { brand, siteUrl } from "@/lib/brand";
 
 const serif = Cormorant_Garamond({
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SiteFooter />
         <BottomNav />
         <WhatsAppButton />
+        <PwaRegister />
       </body>
     </html>
   );

@@ -5,6 +5,7 @@ import { addToCart, toggleWishlist } from "@/app/actions/cart";
 import { formatInr, discountPercent, waLink } from "@/lib/utils";
 import { PincodeCheck } from "@/components/pincode-check";
 import { ProductCard } from "@/components/product-card";
+import { StickyCartBar } from "@/components/sticky-cart-bar";
 import { brand, siteUrl } from "@/lib/brand";
 import type { Metadata } from "next";
 
@@ -32,6 +33,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   });
   if (!product) notFound();
   const addons = await prisma.addon.findMany();
+  const similar = await prisma.product.findMany({
+    where: { published: true, weave: product.weave, id: { not: product.id } },
+    include: { images: { orderBy: { sortOrder: "asc" } } },
+    take: 4,
+  });
   const stock = product.variants.reduce((s, v) => s + v.stock, 0);
   const off = discountPercent(product.pricePaise, product.mrpPaise);
   const jsonLd = {
@@ -79,7 +85,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </p>
           ) : null}
 
-          <form action={addToCart} className="mt-8 space-y-4">
+          <form action={addToCart} id="add-to-bag" className="mt-8 space-y-4">
             <input type="hidden" name="productId" value={product.id} />
             {product.variants.length > 1 ? (
               <label className="block text-sm">
@@ -108,20 +114,23 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               Note
               <input name="note" placeholder="Blouse measurements, gift wrap name…" className="mt-1 min-h-11 w-full border border-[var(--line)] bg-white px-3" />
             </label>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 pb-20 md:pb-0">
               <button className="min-h-12 flex-1 bg-[var(--maroon)] px-6 text-[var(--ivory)]" disabled={stock < 1 && !product.madeToOrder}>
                 Add to bag
               </button>
               <WishButton productId={product.id} />
             </div>
+            <StickyCartBar name={product.name} pricePaise={product.pricePaise} disabled={stock < 1 && !product.madeToOrder} />
           </form>
 
-          <a
-            href={waLink(`I need help draping ${product.name}`)}
-            className="mt-4 inline-block text-sm underline"
-          >
-            Need help draping?
-          </a>
+          <div className="mt-3 flex flex-wrap gap-4 text-sm">
+            <a href="/guide" className="underline">
+              Blouse, fall & fabric guide
+            </a>
+            <a href={waLink(`I need help draping ${product.name}`)} className="underline">
+              Need help draping?
+            </a>
+          </div>
           <PincodeCheck subtotalPaise={product.pricePaise} />
 
           <details className="mt-8 border-t border-[var(--line)] pt-4" open>
@@ -162,6 +171,17 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
             {product.pairWith.map((rel) => (
               <ProductCard key={rel.id} product={rel.paired} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {similar.length > 0 ? (
+        <section className="mt-16">
+          <h2 className="font-serif text-3xl">Similar weaves</h2>
+          <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+            {similar.map((p) => (
+              <ProductCard key={p.id} product={p} />
             ))}
           </div>
         </section>
