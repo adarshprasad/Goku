@@ -48,8 +48,10 @@ export async function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-3 text-sm">
-          <SearchDialog />
-          <Link href="/wishlist" className="min-h-11 min-w-11 inline-flex items-center">
+          <div className="hidden md:block">
+            <SearchDialog />
+          </div>
+          <Link href="/wishlist" className="inline-flex min-h-11 min-w-11 items-center">
             Wish{wish ? ` (${wish})` : ""}
           </Link>
           <Link href={session ? "/account" : "/login"} className="min-h-11 inline-flex items-center">
@@ -106,7 +108,6 @@ export function BottomNav() {
   const items = [
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
-    { href: "/track", label: "Track" },
     { href: "/wishlist", label: "Wish" },
     { href: "/account", label: "Account" },
   ];
@@ -115,7 +116,15 @@ export function BottomNav() {
       className="safe-bottom fixed bottom-0 left-0 right-0 z-40 flex border-t border-[var(--line)] bg-[var(--ivory)] md:hidden"
       aria-label="Mobile"
     >
-      {items.map((i) => (
+      {items.slice(0, 2).map((i) => (
+        <Link key={i.href} href={i.href} className="flex min-h-14 flex-1 items-center justify-center text-sm">
+          {i.label}
+        </Link>
+      ))}
+      <div className="flex min-h-14 flex-1 items-center justify-center">
+        <SearchDialog />
+      </div>
+      {items.slice(2).map((i) => (
         <Link key={i.href} href={i.href} className="flex min-h-14 flex-1 items-center justify-center text-sm">
           {i.label}
         </Link>
