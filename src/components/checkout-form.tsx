@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatInr } from "@/lib/utils";
 
 type CheckoutFormProps = {
   email: string;
+  loggedIn: boolean;
   defaultAddress?: {
     fullName: string;
     phone: string;
@@ -17,11 +19,45 @@ type CheckoutFormProps = {
   subtotalLabel: string;
 };
 
-export function CheckoutForm({ email, defaultAddress, subtotalLabel }: CheckoutFormProps) {
+type Quote = {
+  subtotalPaise: number;
+  discountPaise: number;
+  shippingPaise: number;
+  taxPaise: number;
+  cgstPaise: number;
+  sgstPaise: number;
+  igstPaise: number;
+  codFeePaise: number;
+  totalPaise: number;
+  couponError?: string;
+  codError?: string;
+  couponApplied?: string | null;
+};
+
+export function CheckoutForm({ email, loggedIn, defaultAddress, subtotalLabel }: CheckoutFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [mockNotice, setMockNotice] = useState<string | null>(null);
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const [pincode, setPincode] = useState(defaultAddress?.pincode ?? "");
+  const [state, setState] = useState(defaultAddress?.state ?? "KA");
+  const [coupon, setCoupon] = useState("");
+  const [method, setMethod] = useState<"RAZORPAY" | "COD">("RAZORPAY");
+
+  useEffect(() => {
+    if (!/^\d{6}$/.test(pincode)) return;
+    const t = setTimeout(async () => {
+      const res = await fetch("/api/checkout/quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pincode, state, coupon, method }),
+      });
+      const data = (await res.json()) as Quote & { error?: string };
+      if (res.ok) setQuote(data);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [pincode, state, coupon, method]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -42,6 +78,8 @@ export function CheckoutForm({ email, defaultAddress, subtotalLabel }: CheckoutF
       coupon: String(fd.get("coupon") ?? "") || undefined,
       method: String(fd.get("method")),
       notes: String(fd.get("notes") ?? "") || undefined,
+      giftWrap: fd.get("giftWrap") === "on",
+      saveAddress: fd.get("saveAddress") === "on",
     };
 
     const res = await fetch("/api/checkout", {
@@ -130,11 +168,23 @@ export function CheckoutForm({ email, defaultAddress, subtotalLabel }: CheckoutF
         </label>
         <label className="text-sm">
           State code
-          <input name="state" required defaultValue={defaultAddress?.state ?? "KA"} className="mt-1 min-h-11 w-full border border-[var(--line)] bg-white px-3" />
+          <input
+            name="state"
+            required
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            className="mt-1 min-h-11 w-full border border-[var(--line)] bg-white px-3"
+          />
         </label>
         <label className="text-sm">
           Pincode
-          <input name="pincode" required defaultValue={defaultAddress?.pincode ?? ""} className="mt-1 min-h-11 w-full border border-[var(--line)] bg-white px-3" />
+          <input
+            name="pincode"
+            required
+            value={pincode}
+            onChange={(e) => setPincode(e.target.value)}
+            className="mt-1 min-h-11 w-full border border-[var(--line)] bg-white px-3"
+          />
         </label>
         <label className="text-sm">
           GSTIN on invoice (optional)
@@ -142,24 +192,72 @@ export function CheckoutForm({ email, defaultAddress, subtotalLabel }: CheckoutF
         </label>
         <label className="text-sm sm:col-span-2">
           Coupon
-          <input name="coupon" placeholder="HUDUKU10" className="mt-1 min-h-11 w-full border border-[var(--line)] bg-white px-3 uppercase" />
+          <input
+            name="coupon"
+            value={coupon}
+            onChange={(e) => setCoupon(e.target.value)}
+            placeholder="HUDUKU10"
+            className="mt-1 min-h-11 w-full border border-[var(--line)] bg-white px-3 uppercase"
+          />
         </label>
         <label className="text-sm sm:col-span-2">
           Notes (blouse stitching, gift message)
           <textarea name="notes" rows={3} className="mt-1 w-full border border-[var(--line)] bg-white px-3 py-2" />
         </label>
       </fieldset>
+      <label className="flex min-h-11 items-center gap-2 text-sm">
+        <input type="checkbox" name="giftWrap" /> Gift wrap this order (atelier tissue + note)
+      </label>
+      {loggedIn ? (
+        <label className="flex min-h-11 items-center gap-2 text-sm">
+          <input type="checkbox" name="saveAddress" defaultChecked /> Save this address to my account
+        </label>
+      ) : null}
       <fieldset className="space-y-2">
         <legend className="text-xs uppercase tracking-widest text-[var(--gold-deep)]">Pay</legend>
         <label className="flex min-h-11 items-center gap-2">
-          <input type="radio" name="method" value="RAZORPAY" defaultChecked />
+          <input type="radio" name="method" value="RAZORPAY" checked={method === "RAZORPAY"} onChange={() => setMethod("RAZORPAY")} />
           UPI / cards / netbanking (Razorpay — mock if keys missing)
         </label>
         <label className="flex min-h-11 items-center gap-2">
-          <input type="radio" name="method" value="COD" />
+          <input type="radio" name="method" value="COD" checked={method === "COD"} onChange={() => setMethod("COD")} />
           Cash on delivery (India, eligible pincodes, ₹49 fee)
         </label>
       </fieldset>
+      {quote ? (
+        <dl className="space-y-1 border border-[var(--line)] p-4 text-sm">
+          <div className="flex justify-between">
+            <dt>Subtotal</dt>
+            <dd>{formatInr(quote.subtotalPaise)}</dd>
+          </div>
+          {quote.discountPaise > 0 ? (
+            <div className="flex justify-between">
+              <dt>Coupon {quote.couponApplied}</dt>
+              <dd>−{formatInr(quote.discountPaise)}</dd>
+            </div>
+          ) : null}
+          <div className="flex justify-between">
+            <dt>Shipping</dt>
+            <dd>{quote.shippingPaise === 0 ? "Free" : formatInr(quote.shippingPaise)}</dd>
+          </div>
+          <div className="flex justify-between">
+            <dt>GST</dt>
+            <dd>{formatInr(quote.taxPaise)}</dd>
+          </div>
+          {quote.codFeePaise > 0 ? (
+            <div className="flex justify-between">
+              <dt>COD fee</dt>
+              <dd>{formatInr(quote.codFeePaise)}</dd>
+            </div>
+          ) : null}
+          <div className="flex justify-between font-medium">
+            <dt>Total</dt>
+            <dd>{formatInr(quote.totalPaise)}</dd>
+          </div>
+          {quote.couponError ? <p className="text-red-800">{quote.couponError}</p> : null}
+          {quote.codError ? <p className="text-red-800">{quote.codError}</p> : null}
+        </dl>
+      ) : null}
       {mockNotice ? <p className="text-sm text-[var(--gold-deep)]">{mockNotice}</p> : null}
       {error ? <p className="text-sm text-red-800">{error}</p> : null}
       <button
@@ -214,4 +312,3 @@ function loadScript(src: string) {
     document.body.appendChild(s);
   });
 }
-

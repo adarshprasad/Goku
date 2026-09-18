@@ -40,7 +40,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Search 
         ? { pricePaise: "desc" as const }
         : { createdAt: "desc" as const };
 
-  const [products, weaves, occasions] = await Promise.all([
+  const [products, weaves, occasions, fabrics, colors] = await Promise.all([
     prisma.product.findMany({
       where,
       include: { images: { orderBy: { sortOrder: "asc" } } },
@@ -48,6 +48,8 @@ export default async function ShopPage({ searchParams }: { searchParams: Search 
     }),
     prisma.product.findMany({ select: { weave: true }, distinct: ["weave"] }),
     prisma.product.findMany({ select: { occasion: true }, distinct: ["occasion"] }),
+    prisma.product.findMany({ select: { fabric: true }, distinct: ["fabric"] }),
+    prisma.product.findMany({ select: { color: true }, distinct: ["color"] }),
   ]);
 
   return (
@@ -71,6 +73,18 @@ export default async function ShopPage({ searchParams }: { searchParams: Search 
           <option value="">All occasions</option>
           {occasions.map((w) => (
             <option key={w.occasion}>{w.occasion}</option>
+          ))}
+        </select>
+        <select name="fabric" defaultValue={sp.fabric ?? ""} className="min-h-11 border border-[var(--line)] bg-white px-2">
+          <option value="">All fabrics</option>
+          {fabrics.map((w) => (
+            <option key={w.fabric}>{w.fabric}</option>
+          ))}
+        </select>
+        <select name="color" defaultValue={sp.color ?? ""} className="min-h-11 border border-[var(--line)] bg-white px-2">
+          <option value="">All colours</option>
+          {colors.map((w) => (
+            <option key={w.color}>{w.color}</option>
           ))}
         </select>
         <select name="sort" defaultValue={sp.sort ?? "new"} className="min-h-11 border border-[var(--line)] bg-white px-2">

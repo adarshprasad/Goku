@@ -3,9 +3,9 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { getOrCreateCart, cartTotals } from "@/lib/cart";
-import { applyCoupon, type CouponInput } from "@/lib/coupons";
-import { COD_FEE_PAISE, codEligible, shippingForPincode, gstRateForApparel } from "@/lib/money";
+import type { CouponInput } from "@/lib/coupons";
 import { decrementStockAndMarkPaid } from "@/lib/orders";
+import { quoteCart } from "@/lib/pricing";
 import { brand } from "@/lib/brand";
 
 const checkoutSchema = z.object({
@@ -22,6 +22,8 @@ const checkoutSchema = z.object({
   coupon: z.string().optional(),
   method: z.enum(["RAZORPAY", "COD", "STRIPE"]),
   notes: z.string().optional(),
+  giftWrap: z.boolean().optional(),
+  saveAddress: z.boolean().optional(),
 });
 
 function nextOrderNumber() {
@@ -49,7 +51,6 @@ export async function POST(req: NextRequest) {
   if (data.coupon) {
     couponRow = await prisma.coupon.findUnique({ where: { code: data.coupon.trim().toUpperCase() } });
   }
-  let shipping = shippingForPincode(data.pincode, subtotal);
   const couponInput: CouponInput | null = couponRow
     ? {
         code: couponRow.code,
@@ -64,51 +65,35 @@ export async function POST(req: NextRequest) {
         usedCount: couponRow.usedCount,
       }
     : null;
-  const applied = applyCoupon(couponInput, subtotal, shipping);
-  if (applied.error) {
-    return NextResponse.json({ error: applied.error }, { status: 400 });
+  const quote = quoteCart({
+    lines: lines.map((l) => ({ unitPaise: l.unit + l.extra, quantity: l.item.quantity })),
+    pincode: data.pincode,
+    state: data.state,
+    method: data.method,
+    coupon: couponInput,
+    country: data.country,
+  });
+  if (quote.couponError) {
+    return NextResponse.json({ error: quote.couponError }, { status: 400 });
   }
-  shipping = applied.shippingPaise;
-  const discount = applied.discountPaise;
-
-  const taxableLines = lines.map((l) => ({
-    unitPaise: l.unit + l.extra,
-    quantity: l.item.quantity,
-  }));
-  const subAfter = subtotal - discount;
-  let taxPaise = 0;
-  const origin = brand.originState;
-  for (const l of taxableLines) {
-    const share = subtotal === 0 ? 0 : (l.unitPaise * l.quantity) / subtotal;
-    const lineTaxable = Math.round(subAfter * share);
-    const rate = gstRateForApparel(l.unitPaise);
-    taxPaise += Math.round((lineTaxable * rate) / 100);
+  if (quote.codError) {
+    return NextResponse.json({ error: quote.codError }, { status: 400 });
   }
-  const intra = data.state.toUpperCase() === origin.toUpperCase();
-  const gst = intra
-    ? {
-        taxPaise,
-        cgstPaise: Math.floor(taxPaise / 2),
-        sgstPaise: taxPaise - Math.floor(taxPaise / 2),
-        igstPaise: 0,
-      }
-    : { taxPaise, cgstPaise: 0, sgstPaise: 0, igstPaise: taxPaise };
-
-  let codFee = 0;
-  if (data.method === "COD") {
-    const gate = codEligible(data.pincode, subAfter + shipping + gst.taxPaise + COD_FEE_PAISE);
-    if (!gate.ok) return NextResponse.json({ error: gate.reason }, { status: 400 });
-    if (data.country !== "IN") {
-      return NextResponse.json({ error: "COD is available only in India." }, { status: 400 });
-    }
-    codFee = COD_FEE_PAISE;
-  }
+  const shipping = quote.shippingPaise;
+  const discount = quote.discountPaise;
+  const gst = {
+    taxPaise: quote.taxPaise,
+    cgstPaise: quote.cgstPaise,
+    sgstPaise: quote.sgstPaise,
+    igstPaise: quote.igstPaise,
+  };
+  const codFee = quote.codFeePaise;
 
   if (data.method === "STRIPE" && process.env.ENABLE_INTERNATIONAL !== "true") {
     return NextResponse.json({ error: "International cards are not enabled yet." }, { status: 400 });
   }
 
-  const total = subAfter + shipping + gst.taxPaise + codFee;
+  const total = quote.totalPaise;
 
   for (const line of lines) {
     const stock = line.item.variant?.stock ?? 0;
@@ -155,7 +140,7 @@ export async function POST(req: NextRequest) {
       shippingState: data.state,
       shippingPincode: data.pincode,
       shippingCountry: data.country,
-      notes: data.notes,
+      notes: [data.giftWrap ? "Gift wrap requested." : "", data.notes ?? ""].filter(Boolean).join("\n") || null,
       items: {
         create: lines.map((l) => ({
           productId: l.item.productId,
@@ -174,6 +159,22 @@ export async function POST(req: NextRequest) {
       },
     },
   });
+
+  if (data.saveAddress && session?.user?.id) {
+    await prisma.address.create({
+      data: {
+        userId: session.user.id,
+        fullName: data.fullName,
+        phone: data.phone,
+        line1: data.line1,
+        line2: data.line2 || null,
+        city: data.city,
+        state: data.state,
+        pincode: data.pincode,
+        country: data.country,
+      },
+    });
+  }
 
   if (data.method === "COD") {
     await decrementStockAndMarkPaid(order.id);

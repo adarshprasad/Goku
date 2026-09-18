@@ -27,6 +27,7 @@ export default async function CheckoutPage() {
       <div className="mt-8">
         <CheckoutForm
           email={session?.user?.email ?? ""}
+          loggedIn={Boolean(session?.user?.id)}
           defaultAddress={address}
           subtotalLabel={formatInr(subtotal)}
         />
