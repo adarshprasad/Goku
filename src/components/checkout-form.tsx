@@ -15,9 +15,10 @@ type CheckoutFormProps = {
     pincode: string;
   } | null;
   subtotalLabel: string;
+  payNote?: string;
 };
 
-export function CheckoutForm({ email, defaultAddress, subtotalLabel }: CheckoutFormProps) {
+export function CheckoutForm({ email, defaultAddress, subtotalLabel, payNote }: CheckoutFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -70,7 +71,7 @@ export function CheckoutForm({ email, defaultAddress, subtotalLabel }: CheckoutF
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <p className="text-sm text-[var(--muted)]">
-        Bag {subtotalLabel} before shipping. You will pay on WhatsApp — UPI or transfer with the atelier. No cards on this site.
+        Bag {subtotalLabel} before shipping. {payNote}
       </p>
       <fieldset className="grid gap-3 sm:grid-cols-2">
         <label className="text-sm">

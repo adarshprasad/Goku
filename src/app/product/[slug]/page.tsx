@@ -68,7 +68,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {formatInr(product.pricePaise)}
             {off > 0 ? <span className="ml-2 text-base text-[var(--muted)] line-through">{formatInr(product.mrpPaise)}</span> : null}
           </p>
-          <p className="mt-1 text-sm text-[var(--muted)]">Pay on WhatsApp after you confirm the drape. No cards on this site.</p>
+          <p className="mt-1 text-sm text-[var(--muted)]">{brand.productPayNote}</p>
           <p className="mt-3 text-sm">
             {stock > 0 ? `${stock} in atelier` : "Made to order"}
             {stock > 0 && stock <= 3 ? " · low stock" : ""}

@@ -157,10 +157,12 @@ Then `npm run build` and restart `npm start` plus the Cloudflare tunnel. Login/c
 
 Sign in as admin, then open `/admin` (or Account → Admin).
 
-- **Brand & pages** — domain, WhatsApp number, logo, About, legal, checkout intro, **admin password**
-- **Catalog** — drapes, photos, price, stock
+- **Brand & pages** — name, domain, WhatsApp, logo, menu, home copy, about, legal, **admin email & password**
+- **Catalog** — drapes, photos, price, stock (open from the desk cards)
 - **Collections / Home banners / Journal / Finishing** — copy and images
 - **Coupons / Orders** — codes, tracking, mark PAID, open WhatsApp for that order
+
+The admin header stays on every desk page. On a phone, **Admin** is in the top bar and the bottom bar after you sign in.
 
 Uploads land in `public/uploads` (and logos in `public/brand`) on the machine that runs `npm start`.
 

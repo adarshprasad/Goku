@@ -5,16 +5,15 @@ import { auth } from "@/auth";
 import { getCart } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
 
-const nav = [
-  { href: "/shop", label: "Shop" },
-  { href: "/collections/wedding", label: "Wedding" },
-  { href: "/collections/handloom", label: "Handloom" },
-  { href: "/journal", label: "Journal" },
-  { href: "/about", label: "Atelier" },
-];
-
 export async function SiteHeader() {
   const [session, brand] = await Promise.all([auth(), getBrand()]);
+  const nav = [
+    { href: "/shop", label: brand.navShop },
+    { href: brand.navWeddingHref, label: brand.navWedding },
+    { href: brand.navHandloomHref, label: brand.navHandloom },
+    { href: "/journal", label: brand.navJournal },
+    { href: "/about", label: brand.navAbout },
+  ];
   let count = 0;
   try {
     const cart = await getCart();
@@ -43,7 +42,7 @@ export async function SiteHeader() {
           <span>
             <span className="block font-serif text-2xl tracking-tight text-[var(--ivory)]">{brand.name}</span>
             <span className="mt-0.5 hidden text-[10px] tracking-[0.14em] text-[var(--ivory)]/70 sm:block">
-              Bengaluru
+              {brand.headerCity}
             </span>
           </span>
         </Link>
@@ -56,8 +55,11 @@ export async function SiteHeader() {
         </nav>
         <div className="flex items-center gap-3 text-sm">
           {staff ? (
-            <Link href="/admin" className="hidden min-h-11 items-center md:inline-flex">
-              Desk
+            <Link
+              href="/admin"
+              className="inline-flex min-h-11 items-center border border-[var(--ivory)]/50 px-3 text-[var(--ivory)]"
+            >
+              Admin
             </Link>
           ) : null}
           <Link href="/wishlist" className="min-h-11 min-w-11 inline-flex items-center text-[var(--ivory)]/85">
@@ -104,7 +106,9 @@ export async function SiteFooter() {
         </div>
         <div className="text-sm text-[var(--ivory)]/80">
           <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--ivory)]/55">Promise</p>
-          <p className="mt-3">Prepaid UPI & cards. GST invoice. {brand.shippingIndia}.</p>
+          <p className="mt-3">
+            {brand.footerPromise} {brand.shippingIndia}.
+          </p>
           <p className="mt-2">GSTIN {brand.gstin}</p>
         </div>
       </div>
@@ -112,11 +116,13 @@ export async function SiteFooter() {
   );
 }
 
-export function BottomNav() {
+export async function BottomNav() {
+  const session = await auth();
+  const staff = session?.user?.role === "ADMIN" || session?.user?.role === "STAFF";
   const items = [
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
-    { href: "/wishlist", label: "Wish" },
+    ...(staff ? [{ href: "/admin", label: "Admin" }] : [{ href: "/wishlist", label: "Wish" }]),
     { href: "/account", label: "Account" },
   ];
   return (

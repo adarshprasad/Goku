@@ -27,6 +27,7 @@ export default async function CheckoutPage() {
           email={session?.user?.email ?? ""}
           defaultAddress={address}
           subtotalLabel={formatInr(subtotal)}
+          payNote={brand.checkoutPayNote}
         />
       </div>
     </div>
