@@ -1,11 +1,9 @@
-import { formatInr, waLink } from "./utils";
+import { formatInr, waLink, whatsappDigits } from "./utils";
 
-export function whatsappDigits(raw: string) {
-  return raw.replace(/\D/g, "") || "918045672100";
-}
+export { whatsappDigits };
 
 export function waMe(phone: string, text: string) {
-  return waLink(text, whatsappDigits(phone));
+  return waLink(text, phone);
 }
 
 export type WhatsAppOrderLine = { name: string; quantity: number; sku?: string };

@@ -18,8 +18,18 @@ export function discountPercent(pricePaise: number, mrpPaise: number) {
   return Math.round(((mrpPaise - pricePaise) / mrpPaise) * 100);
 }
 
+/** wa.me needs country code + number with no +, spaces, or dashes. */
+export function whatsappDigits(raw?: string | null) {
+  let d = String(raw ?? "").replace(/\D/g, "");
+  if (d.startsWith("00")) d = d.slice(2);
+  if (d.length === 11 && d.startsWith("0")) d = d.slice(1);
+  if (d.length === 10) d = `91${d}`;
+  if (d.startsWith("91") && d.length === 13 && d[2] === "0") d = `91${d.slice(3)}`;
+  return d || "918045672100";
+}
+
 export function waLink(text?: string, phone?: string) {
-  const n = phone ?? process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "918045672100";
+  const n = whatsappDigits(phone ?? process.env.NEXT_PUBLIC_WHATSAPP_NUMBER);
   const q = text ? `?text=${encodeURIComponent(text)}` : "";
   return `https://wa.me/${n}${q}`;
 }

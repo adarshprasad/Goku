@@ -61,7 +61,10 @@ export default async function AdminSettingsPage() {
           <div className="grid gap-6 md:grid-cols-2">
             <Field name="supportEmail" label="Public email" defaultValue={brand.supportEmail} type="email" />
             <Field name="supportPhone" label="Public phone" defaultValue={brand.supportPhone} />
-            <Field name="whatsapp" label="WhatsApp number (country code, no +)" defaultValue={brand.whatsapp} />
+            <Field name="whatsapp" label="WhatsApp number (the phone that has WhatsApp)" defaultValue={brand.whatsapp} />
+            <p className="-mt-2 text-xs text-[var(--muted)] md:col-span-2">
+              Use the number that already opens WhatsApp on your phone. A 10-digit Indian mobile is enough. Plus and spaces are stripped. If WhatsApp says it could not look up the number, that SIM is not on WhatsApp.
+            </p>
             <Field name="gstin" label="GSTIN" defaultValue={brand.gstin} />
           </div>
           <Field name="address" label="Address (footer + about + invoices)" defaultValue={brand.address} textarea />

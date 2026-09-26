@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getBrand } from "@/lib/brand";
+import { waLink } from "@/lib/utils";
 import { auth } from "@/auth";
 import { getCart } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
@@ -147,7 +148,7 @@ export async function BottomNav() {
 
 export async function WhatsAppButton() {
   const brand = await getBrand();
-  const href = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent(`Namaskara, I would like help choosing a ${brand.name} drape.`)}`;
+  const href = waLink(`Namaskara, I would like help choosing a ${brand.name} drape.`, brand.whatsapp);
   return (
     <a
       href={href}
