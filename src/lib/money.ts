@@ -1,6 +1,8 @@
+import { commerce } from "./commerce";
+
 /** GST on apparel: 5% if sale value ≤ ₹1000, else 12%. Amounts in paise. */
 export function gstRateForApparel(unitPaise: number): 5 | 12 {
-  return unitPaise <= 100_000 ? 5 : 12;
+  return unitPaise <= commerce.gstThresholdPaise ? commerce.gstLowPercent : commerce.gstHighPercent;
 }
 
 export type TaxSplit = {
@@ -16,7 +18,7 @@ export function splitGst(params: {
   shipToState: string;
   originState?: string;
 }): TaxSplit {
-  const origin = params.originState ?? "KA";
+  const origin = params.originState ?? commerce.originState;
   const taxPaise = Math.round((params.taxablePaise * params.ratePercent) / 100);
   const intra = params.shipToState.toUpperCase() === origin.toUpperCase();
   if (intra) {
@@ -32,15 +34,17 @@ export function splitGst(params: {
 }
 
 export function shippingForPincode(pincode: string, subtotalPaise: number): number {
-  if (subtotalPaise >= 8_000_00) return 0;
-  if (!/^\d{6}$/.test(pincode)) return 14_900;
+  if (subtotalPaise >= commerce.freeShippingSubtotalPaise) return 0;
+  if (!/^\d{6}$/.test(pincode)) return commerce.invalidPincodeShippingPaise;
   const zone = Number(pincode.slice(0, 2));
-  if (zone >= 56 && zone <= 59) return 4_900;
-  return 9_900;
+  if (zone >= commerce.localPincodePrefixMin && zone <= commerce.localPincodePrefixMax) {
+    return commerce.localShippingPaise;
+  }
+  return commerce.nationalShippingPaise;
 }
 
-export const COD_FEE_PAISE = 4_900;
-export const COD_MAX_PAISE = 25_000_00;
+export const COD_FEE_PAISE = commerce.codFeePaise;
+export const COD_MAX_PAISE = commerce.codMaxPaise;
 
 export function codEligible(pincode: string, totalPaise: number): {
   ok: boolean;
@@ -52,7 +56,7 @@ export function codEligible(pincode: string, totalPaise: number): {
   if (totalPaise > COD_MAX_PAISE) {
     return { ok: false, reason: "COD is available on orders up to ₹25,000." };
   }
-  const blocked = new Set(["110001", "400001", "999999"]);
+  const blocked = new Set<string>(commerce.codBlockedPincodes);
   if (blocked.has(pincode)) {
     return { ok: false, reason: "COD is not available for this pincode." };
   }

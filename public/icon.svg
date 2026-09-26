@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" fill="#6b1d2a"/>
-  <text x="32" y="42" text-anchor="middle" font-size="28" fill="#f7f1e8" font-family="Georgia, serif">H</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ಸುಬ್ಬ & ಸುಬ್ಬಿ">
+  <rect width="64" height="64" rx="16" fill="#f7fbfb"/>
+  <circle cx="32" cy="24" r="8" fill="none" stroke="#076d77" stroke-width="2"/>
+  <circle cx="26" cy="18" r="3.2" fill="none" stroke="#076d77" stroke-width="2"/>
+  <circle cx="38" cy="18" r="3.2" fill="none" stroke="#076d77" stroke-width="2"/>
+  <path d="M22 40c2 8 18 8 20 0" fill="none" stroke="#076d77" stroke-width="2" stroke-linecap="round"/>
 </svg>

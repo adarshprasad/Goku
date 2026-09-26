@@ -29,6 +29,7 @@ model User {
   measurements   MeasurementProfile[]
   returnRequests ReturnRequest[]
   auditLogs      AuditLog[]
+  hospital       HospitalAccount?
 }
 
 model Account {
@@ -98,6 +99,15 @@ model Product {
   sku             String               @unique
   name            String
   type            String
+  audience        String               @default("baby")
+  category        String               @default("set")
+  ageRange        String               @default("Newborn")
+  packOf          Int                  @default(1)
+  preWashed       Boolean              @default(true)
+  contents        String               @default("[]")
+  minOrderQty     Int                  @default(1)
+  hospitalOnly    Boolean              @default(false)
+  priceBreaks     String               @default("[]")
   description     String
   craftStory      String
   artisanNote     String?
@@ -284,6 +294,7 @@ model Order {
   addressId        String?
   address          Address?        @relation(fields: [addressId], references: [id])
   notes            String?
+  channel          String          @default("RETAIL")
   trackingNumber   String?
   trackingUrl      String?
   createdAt        DateTime        @default(now())
@@ -405,4 +416,25 @@ model AuditLog {
 model Setting {
   key   String @id
   value String
+}
+
+model HospitalAccount {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hospitalName  String
+  city          String
+  gstin         String
+  contactName   String
+  phone         String
+  maternityBeds Int
+  monthlyBirths Int
+  wardLine1     String
+  wardCity      String
+  wardState     String
+  wardPincode   String
+  status        String   @default("PENDING")
+  priceTier     String   @default("STANDARD")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

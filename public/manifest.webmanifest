@@ -1,12 +1,19 @@
 {
-  "name": "Huduku",
-  "short_name": "Huduku",
-  "description": "Hennige anda seere inda — premium Indian sarees from Bengaluru.",
+  "name": "SubbaSubbi — newborn sets",
+  "short_name": "SubbaSubbi",
+  "description": "Pre-washed newborn clothing sets for hospitals and new mothers.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f7f1e8",
-  "theme_color": "#6b1d2a",
+  "background_color": "#f7fbfb",
+  "theme_color": "#076d77",
   "icons": [
+    {
+      "src": "/brand/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/icon.svg",
       "sizes": "any",

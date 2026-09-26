@@ -2,143 +2,200 @@ import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProductCard } from "@/components/product-card";
-import { brand } from "@/lib/brand";
-import { waLink } from "@/lib/utils";
+import { ages, brand, categories } from "@/lib/brand";
+
+const kitPieces = [
+  { name: "Pre-washed jabla", qty: "3" },
+  { name: "Muslin nappy", qty: "5" },
+  { name: "Swaddle", qty: "2" },
+  { name: "Hooded towel", qty: "1" },
+];
 
 export default async function HomePage() {
-  const [featured, collections, posts, banners] = await Promise.all([
-    prisma.product.findMany({
-      where: { featured: true, published: true },
-      include: { images: { orderBy: { sortOrder: "asc" } } },
-      take: 8,
-    }),
-    prisma.collection.findMany({ orderBy: { sortOrder: "asc" } }),
-    prisma.journalPost.findMany({ orderBy: { publishedAt: "desc" }, take: 3 }),
-    prisma.banner.findMany({ where: { active: true }, orderBy: { sort: "asc" } }),
-  ]);
-
-  const hero = banners[0];
+  let featured: Awaited<ReturnType<typeof loadFeatured>> = [];
+  let reviews: { id: string; authorName: string; title: string; body: string; rating: number }[] = [];
+  try {
+    [featured, reviews] = await Promise.all([loadFeatured(), loadReviews()]);
+  } catch {
+    featured = [];
+    reviews = [];
+  }
 
   return (
     <div>
-      <section className="relative min-h-[72vh] bg-[var(--maroon-deep)] text-[var(--ivory)]">
-        {hero ? (
-          <Image
-            src={hero.image}
-            alt=""
-            fill
-            priority
-            className="object-cover opacity-50"
-            sizes="100vw"
-          />
-        ) : null}
-        <div className="relative mx-auto flex min-h-[72vh] max-w-6xl flex-col justify-end px-4 py-16">
-          <p className="text-xs uppercase tracking-[0.28em] text-[var(--gold)]">{brand.taglineKn}</p>
-          <h1 className="mt-4 max-w-2xl font-serif text-5xl leading-[1.1] md:text-7xl">
-            {brand.name}
-            <span className="mt-3 block font-sans text-lg font-normal tracking-normal text-[var(--ivory)]/80 md:text-xl">
-              {brand.taglineEn}. Handloom, temple borders, and finishing — from a Bengaluru atelier.
-            </span>
-          </h1>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/shop" className="inline-flex min-h-12 items-center bg-[var(--ivory)] px-6 text-[var(--maroon)]">
-              Shop the new weave
-            </Link>
-            <Link href="/collections/handloom" className="inline-flex min-h-12 items-center border border-[var(--ivory)] px-6">
-              Handloom
-            </Link>
+      <section className="bg-white">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:py-20">
+          <div>
+            <Image
+              src="/brand/lockup.png"
+              alt={`${brand.nameKn}. ${brand.tagline}`}
+              width={370}
+              height={197}
+              priority
+              className="h-auto w-full max-w-md"
+            />
+            <h1 className="mt-6 max-w-md font-serif text-4xl leading-[1.1] text-[var(--ink)] md:text-5xl">
+              Pre-washed sets for hospitals and new mothers
+            </h1>
+            <p className="mt-5 max-w-md text-base leading-relaxed text-[var(--muted)]">
+              Clothing that is washed, softened, and sealed before it reaches a newborn. One door for maternity wards. One door for the mother taking a set home.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/shop?audience=mother" className="inline-flex min-h-12 items-center rounded-full bg-[var(--clay)] px-6 text-white">
+                Shop mother & baby sets
+              </Link>
+              <Link href="/hospital" className="inline-flex min-h-12 items-center rounded-full border border-[var(--clay)] px-6 text-[var(--clay)]">
+                Hospital orders
+              </Link>
+            </div>
           </div>
+          <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-[var(--sand)]">
+            <Image
+              src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1200&q=80"
+              alt="Placeholder photo of a newborn — replace with SubbaSubbi photography"
+              fill
+              priority
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-[var(--line)]">
+        <ul className="mx-auto grid max-w-6xl gap-4 px-4 py-6 text-sm sm:grid-cols-2 lg:grid-cols-4">
+          {["Pre-washed & sealed", "Hospital-packed sets", "Soft cotton & muslin", "Delivered across India"].map((item) => (
+            <li key={item} className="rounded-2xl bg-[var(--sand)] px-4 py-3">
+              {item}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mx-auto grid max-w-6xl gap-4 px-4 py-14 md:grid-cols-2">
+        <Link href="/hospital" className="rounded-3xl bg-[var(--sand)] p-8">
+          <p className="text-xs uppercase tracking-[0.18em] text-[var(--clay)]">For hospitals</p>
+          <h2 className="mt-3 font-serif text-3xl">Newborn kits for the ward</h2>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">
+            Bulk pricing, GST invoice, and a delivery date for the maternity ward. Reorder last month in one tap.
+          </p>
+        </Link>
+        <Link href="/shop?audience=mother" className="rounded-3xl bg-[var(--blush)] p-8">
+          <p className="text-xs uppercase tracking-[0.18em] text-[var(--clay-deep)]">For new mothers</p>
+          <h2 className="mt-3 font-serif text-3xl">What to pack for the hospital</h2>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--ink)]/80">
+            A mother-and-baby going-home set, first-month clothes, and feeding wear that opens without a fuss.
+          </p>
+        </Link>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4">
+        <h2 className="font-serif text-3xl">Shop by need</h2>
+        <div className="mt-5 flex gap-2 overflow-x-auto pb-2">
+          {categories.map((c) => (
+            <Link
+              key={c.slug}
+              href={`/shop?category=${c.slug}`}
+              className="shrink-0 rounded-full border border-[var(--line)] bg-white px-4 py-2 text-sm"
+            >
+              {c.label}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-12">
+        <h2 className="font-serif text-3xl">Shop by age</h2>
+        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+          {ages.map((age) => (
+            <Link key={age} href={`/shop?age=${encodeURIComponent(age)}`} className="rounded-2xl bg-[var(--sand)] px-4 py-6 text-center">
+              <span className="font-serif text-xl">{age}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4">
+        <div className="flex items-end justify-between">
+          <h2 className="font-serif text-3xl">Featured sets</h2>
+          <Link href="/shop" className="text-sm underline">
+            All sets
+          </Link>
+        </div>
+        {featured.length === 0 ? (
+          <p className="mt-6 text-[var(--muted)]">Catalog is loading. Seed the database to see sets.</p>
+        ) : (
+          <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+            {featured.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mx-auto mt-16 grid max-w-6xl gap-8 px-4 md:grid-cols-2">
+        <div>
+          <h2 className="font-serif text-3xl">What’s inside a hospital kit</h2>
+          <p className="mt-3 text-sm text-[var(--muted)]">
+            A typical first-day set. Exact counts are on each product, and wards can change the mix after approval.
+          </p>
+          <ul className="mt-6 divide-y divide-[var(--line)]">
+            {kitPieces.map((piece) => (
+              <li key={piece.name} className="flex justify-between py-3 text-sm">
+                <span>{piece.name}</span>
+                <span className="text-[var(--muted)]">{piece.qty}</span>
+              </li>
+            ))}
+          </ul>
+          <Link href="/hospital-kit" className="mt-4 inline-block text-sm underline">
+            Read the full kit
+          </Link>
+        </div>
+        <div className="rounded-3xl bg-[var(--sand)] p-8">
+          <p className="text-xs uppercase tracking-[0.18em] text-[var(--clay)]">From the founder</p>
+          <p className="mt-4 font-serif text-2xl leading-snug">
+            Newborn skin should meet cloth that has already been washed. Hospitals needed that as a set, not a pile of loose pieces. Mothers asked for the same set to take home.
+          </p>
+          <Link href="/about" className="mt-6 inline-block text-sm underline">
+            Our story
+          </Link>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <p className="text-xs uppercase tracking-[0.22em] text-[var(--gold-deep)]">Shop by weave</p>
-        <div className="mt-6 flex gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible">
-          {collections.map((c) => (
-            <Link key={c.id} href={`/collections/${c.slug}`} className="min-w-[220px] shrink-0">
-              <div className="relative aspect-[4/5] overflow-hidden bg-[var(--ivory-2)]">
-                <Image src={c.image} alt="" fill className="object-cover" sizes="33vw" />
-              </div>
-              <h2 className="mt-3 font-serif text-2xl">{c.name}</h2>
-              <p className="text-sm text-[var(--muted)]">{c.tagline}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 py-8">
-        <div className="flex items-end justify-between">
-          <h2 className="font-serif text-3xl">Bestsellers</h2>
-          <Link href="/shop" className="text-sm underline">
-            All drapes
-          </Link>
-        </div>
-        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-          {featured.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto my-16 grid max-w-6xl gap-10 px-4 md:grid-cols-2 md:items-center">
-        <div className="relative aspect-[4/5] bg-[var(--ivory-2)]">
-          <Image
-            src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1400&q=80"
-            alt="Handloom silk being inspected"
-            fill
-            className="object-cover"
-            sizes="50vw"
-          />
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.22em] text-[var(--gold-deep)]">Craft</p>
-          <h2 className="mt-3 font-serif text-4xl">Named looms, honest gold.</h2>
-          <p className="mt-4 text-[var(--muted)] leading-relaxed">
-            We buy from GI clusters — Banaras, Kanchipuram, Chanderi, Paithan — and finish fall, pico, and blouse in Bengaluru.
-            If a piece is powerloom, the product page says so.
-          </p>
-          <Link href="/about" className="mt-6 inline-flex min-h-11 items-center underline">
-            Meet the atelier
-          </Link>
-        </div>
-      </section>
-
-      <section className="bg-[#f3eadc] py-16">
-        <div className="mx-auto max-w-6xl px-4">
-          <h2 className="font-serif text-3xl">Journal</h2>
-          <div className="mt-8 grid gap-8 md:grid-cols-3">
-            {posts.map((p) => (
-              <Link key={p.id} href={`/journal/${p.slug}`}>
-                <div className="relative aspect-[16/10] overflow-hidden bg-[var(--ivory-2)]">
-                  <Image src={p.image} alt="" fill className="object-cover" sizes="33vw" />
-                </div>
-                <h3 className="mt-3 font-serif text-xl">{p.title}</h3>
-                <p className="mt-2 text-sm text-[var(--muted)]">{p.excerpt}</p>
-              </Link>
+        <h2 className="font-serif text-3xl">Loved by parents</h2>
+        {reviews.length === 0 ? (
+          <p className="mt-4 text-[var(--muted)]">Reviews appear here after the catalog is seeded.</p>
+        ) : (
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {reviews.map((r) => (
+              <blockquote key={r.id} className="rounded-3xl border border-[var(--line)] p-5">
+                <p className="font-serif text-xl">{r.title}</p>
+                <p className="mt-2 text-sm text-[var(--muted)]">{r.body}</p>
+                <footer className="mt-3 text-xs uppercase tracking-widest">
+                  {r.authorName} · {r.rating}/5
+                </footer>
+              </blockquote>
             ))}
           </div>
-        </div>
+        )}
       </section>
-
-      <section className="mx-auto grid max-w-6xl gap-6 px-4 py-16 md:grid-cols-4">
-        {[
-          ["Prepaid & UPI", "Razorpay checkout. We never store cards."],
-          ["GST invoice", `HSN on every silk. GSTIN ${brand.gstin}.`],
-          ["India shipping", brand.shippingIndia],
-          ["WhatsApp atelier", "Drape help, measurements, and order care."],
-        ].map(([t, d]) => (
-          <div key={t} className="border border-[var(--line)] p-5">
-            <h3 className="font-serif text-xl">{t}</h3>
-            <p className="mt-2 text-sm text-[var(--muted)]">{d}</p>
-          </div>
-        ))}
-      </section>
-
-      <p className="pb-8 text-center text-sm">
-        <a href={waLink("I would like a draping appointment.")} className="underline">
-          Book a draping appointment
-        </a>
-      </p>
     </div>
   );
+}
+
+async function loadFeatured() {
+  return prisma.product.findMany({
+    where: { featured: true, published: true, hospitalOnly: false },
+    include: { images: { orderBy: { sortOrder: "asc" } }, variants: true },
+    take: 8,
+  });
+}
+
+async function loadReviews() {
+  return prisma.review.findMany({
+    where: { published: true },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
 }

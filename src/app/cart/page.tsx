@@ -11,7 +11,7 @@ export default async function CartPage() {
       <div className="mx-auto max-w-4xl px-4 py-12">
         <h1 className="font-serif text-4xl">Bag</h1>
         <p className="mt-8 text-[var(--muted)]">
-          Your bag is empty. <Link href="/shop" className="underline">Shop drapes</Link>
+          Your bag is empty. <Link href="/shop" className="underline">Shop sets</Link>
         </p>
       </div>
     );
@@ -24,7 +24,7 @@ export default async function CartPage() {
       <h1 className="font-serif text-4xl">Bag</h1>
       {lines.length === 0 ? (
         <p className="mt-8 text-[var(--muted)]">
-          Your bag is empty. <Link href="/shop" className="underline">Shop drapes</Link>
+          Your bag is empty. <Link href="/shop" className="underline">Shop sets</Link>
         </p>
       ) : (
         <div className="mt-8 space-y-8">

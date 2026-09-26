@@ -1,8 +1,6 @@
-# Huduku
+# SubbaSubbi
 
-Premium saree atelier storefront — Next.js, Prisma (SQLite locally / Postgres in production), Razorpay (or labeled mock gateway), admin desk, PWA.
-
-**Hennige anda seere inda** — adds beauty to the woman.
+Pre-washed newborn clothing sets for hospitals and new mothers. Next.js storefront, hospital portal, admin desk, Razorpay (or a labeled mock gateway), and an installable PWA.
 
 ## Quick start
 
@@ -19,38 +17,36 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Role | Email | Password |
 |------|--------|----------|
-| Customer | customer@huduku.in | huduku123 |
-| Admin | admin@huduku.in | huduku-admin |
+| Mother | customer@subbasubbi.in | subba123 |
+| Hospital | hospital@subbasubbi.in | subba-hospital |
+| Admin | admin@subbasubbi.in | subba-admin |
 
-Coupons: `HUDUKU10`, `FIRSTDRAPE`, `FREESHIP`.
+Coupons: `SOFT10`, `FIRSTSET`, `FREESHIP`.
+
+Hospital bulk rates show only after an account is approved. The demo hospital user is already approved. Apply at `/hospital`. Approve applications at `/admin/hospitals`.
 
 ## Payments
 
 Leave `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` empty to use the **mock gateway**. It still creates the order, verifies on the server, decrements stock, and writes a GST invoice number.
 
-When keys are present, checkout opens Razorpay (UPI, cards, netbanking, wallets, EMI). Confirm payment only via `/api/webhooks/razorpay` (signature).
+When keys are present, checkout opens Razorpay (UPI, cards, netbanking, wallets). Confirm payment only via `/api/webhooks/razorpay`.
 
-COD: India, eligible pincodes, ₹49 fee, max ₹25,000. Blocked demo pincodes: 110001, 400001, 999999.
-
-Stripe is gated behind `ENABLE_INTERNATIONAL=true`.
+COD: India, eligible PIN codes, fee and cap from `src/lib/commerce.ts`. Blocked demo PIN codes: 110001, 400001, 999999.
 
 ## Stack
 
 - Next.js 15 App Router, TypeScript, Tailwind
-- Auth.js credentials (Google optional)
-- Prisma + SQLite (`DATABASE_URL=file:./dev.db`). For production set a Postgres URL and change `provider` in `prisma/schema.prisma`
-- Admin at `/admin` (ADMIN / STAFF)
-- PWA: `public/manifest.webmanifest`
+- Auth.js credentials
+- Prisma + SQLite locally. For production set a Postgres URL and change `provider` in `prisma/schema.prisma`
+- Admin at `/admin`
+- Catalog JSON for a later app: `GET /api/catalog` (bulk rates only for an approved hospital session)
+- PWA: `public/manifest.webmanifest` and `public/sw.js`
 - Expo notes: `apps/mobile/README.md`
+
+Photos in the seed are placeholders. Replace them with your own product photography.
 
 ## Tests
 
 ```bash
 npm test
 ```
-
-Price/tax/coupon unit tests live in `src/lib/*.test.ts`.
-
-## Brand
-
-Huduku, Lavelle Road, Bengaluru. GSTIN and WhatsApp are env-driven — see `.env.example`.
