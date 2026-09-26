@@ -69,7 +69,7 @@ export default async function AdminSettingsPage() {
           </div>
           <Field name="address" label="Address (footer + about + invoices)" defaultValue={brand.address} textarea />
           <div className="grid gap-6 md:grid-cols-2">
-            <Field name="instagram" label="Instagram URL" defaultValue={brand.instagram} />
+            <Field name="instagram" label="Instagram URL (https://instagram.com/yourname)" defaultValue={brand.instagram} />
             <Field name="headerCity" label="City under the logo in the header" defaultValue={brand.headerCity} />
           </div>
           <Field name="originState" label="Origin state code for GST (e.g. KA)" defaultValue={brand.originState} />

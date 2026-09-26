@@ -102,6 +102,13 @@ export async function SiteFooter() {
           <p className="mt-3 text-sm leading-relaxed text-[var(--ivory)]/80">{brand.address}</p>
           <p className="mt-2 text-sm">{brand.supportEmail}</p>
           <p className="text-sm">{brand.supportPhone}</p>
+          {brand.instagram ? (
+            <p className="mt-2 text-sm">
+              <a href={brand.instagram} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                Instagram
+              </a>
+            </p>
+          ) : null}
         </div>
         <div className="flex flex-col gap-2 text-sm text-[var(--ivory)]/85">
           <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--ivory)]/55">Client care</p>
