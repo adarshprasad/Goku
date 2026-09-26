@@ -7,6 +7,7 @@ const links = [
   { href: "/admin/collections", label: "Collections" },
   { href: "/admin/banners", label: "Home banners" },
   { href: "/admin/journal", label: "Journal" },
+  { href: "/admin/addons", label: "Finishing" },
   { href: "/admin/coupons", label: "Coupons" },
   { href: "/admin/orders", label: "Orders" },
 ];

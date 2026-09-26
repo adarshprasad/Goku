@@ -29,13 +29,12 @@ export default async function LoginPage({
     <div className="mx-auto max-w-md px-4 py-16">
       <h1 className="font-serif text-4xl">Sign in</h1>
       <p className="mt-2 text-sm text-[var(--muted)]">
-        Admin desk: <code>admin@huduku.in</code> / <code>huduku-admin</code> — then open Account → Admin, or{" "}
+        Change this password in Admin → Brand & pages before you share the shop.
+        <br />
+        Admin desk: <code>admin@huduku.in</code> / <code>huduku-admin</code> — then{" "}
         <a href="/admin" className="underline">
           /admin
         </a>
-        .
-        <br />
-        Demo customer <code>customer@huduku.in</code> / <code>huduku123</code>
       </p>
       <form action={login} className="mt-8 space-y-4">
         <input name="email" type="email" required placeholder="Email" className="min-h-11 w-full border border-[var(--line)] px-3" />

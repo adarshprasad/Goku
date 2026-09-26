@@ -4,9 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { getOrCreateCart, cartTotals } from "@/lib/cart";
 import { applyCoupon, type CouponInput } from "@/lib/coupons";
-import { COD_FEE_PAISE, codEligible, shippingForPincode, gstRateForApparel } from "@/lib/money";
-import { decrementStockAndMarkPaid } from "@/lib/orders";
+import { shippingForPincode, gstRateForApparel } from "@/lib/money";
 import { getBrand } from "@/lib/brand";
+import { buildWhatsAppOrderText, waMe } from "@/lib/whatsapp-order";
 
 const checkoutSchema = z.object({
   email: z.string().email(),
@@ -20,7 +20,6 @@ const checkoutSchema = z.object({
   country: z.string().default("IN"),
   gstin: z.string().optional(),
   coupon: z.string().optional(),
-  method: z.enum(["RAZORPAY", "COD", "STRIPE"]),
   notes: z.string().optional(),
 });
 
@@ -28,7 +27,7 @@ function nextOrderNumber() {
   const d = new Date();
   const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
   const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `HDK-${ymd}-${rand}`;
+  return `TAV-${ymd}-${rand}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -95,36 +94,8 @@ export async function POST(req: NextRequest) {
       }
     : { taxPaise, cgstPaise: 0, sgstPaise: 0, igstPaise: taxPaise };
 
-  let codFee = 0;
-  if (data.method === "COD") {
-    const gate = codEligible(data.pincode, subAfter + shipping + gst.taxPaise + COD_FEE_PAISE);
-    if (!gate.ok) return NextResponse.json({ error: gate.reason }, { status: 400 });
-    if (data.country !== "IN") {
-      return NextResponse.json({ error: "COD is available only in India." }, { status: 400 });
-    }
-    codFee = COD_FEE_PAISE;
-  }
-
-  if (data.method === "STRIPE" && process.env.ENABLE_INTERNATIONAL !== "true") {
-    return NextResponse.json({ error: "International cards are not enabled yet." }, { status: 400 });
-  }
-
-  const total = subAfter + shipping + gst.taxPaise + codFee;
-
-  for (const line of lines) {
-    const stock = line.item.variant?.stock ?? 0;
-    if (line.item.quantity > stock) {
-      return NextResponse.json(
-        { error: `${line.item.product.name} does not have enough stock.` },
-        { status: 409 },
-      );
-    }
-  }
-
+  const total = subAfter + shipping + gst.taxPaise;
   const number = nextOrderNumber();
-  const razorpayKey = process.env.RAZORPAY_KEY_ID;
-  const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
-  const useLiveRazorpay = data.method === "RAZORPAY" && Boolean(razorpayKey && razorpaySecret);
 
   const order = await prisma.order.create({
     data: {
@@ -134,8 +105,8 @@ export async function POST(req: NextRequest) {
       phone: data.phone,
       status: "PENDING",
       paymentStatus: "UNPAID",
-      paymentMethod: data.method,
-      gateway: useLiveRazorpay ? "RAZORPAY" : data.method === "COD" ? "COD" : "MOCK",
+      paymentMethod: "WHATSAPP",
+      gateway: "WHATSAPP",
       subtotalPaise: subtotal,
       discountPaise: discount,
       shippingPaise: shipping,
@@ -143,7 +114,7 @@ export async function POST(req: NextRequest) {
       cgstPaise: gst.cgstPaise,
       sgstPaise: gst.sgstPaise,
       igstPaise: gst.igstPaise,
-      codFeePaise: codFee,
+      codFeePaise: 0,
       totalPaise: total,
       couponId: couponRow?.id,
       couponCode: couponRow?.code,
@@ -171,55 +142,43 @@ export async function POST(req: NextRequest) {
         })),
       },
       events: {
-        create: { type: "CREATED", message: "Order created, awaiting payment." },
+        create: { type: "CREATED", message: "Order sent to WhatsApp. Awaiting confirmation." },
       },
     },
   });
 
-  if (data.method === "COD") {
-    await decrementStockAndMarkPaid(order.id);
-    await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
-    return NextResponse.json({
-      mode: "cod",
-      orderId: order.id,
-      number: order.number,
-      redirect: `/checkout/success?order=${order.number}`,
-    });
-  }
+  await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
 
-  if (useLiveRazorpay) {
-    const Razorpay = (await import("razorpay")).default;
-    const rzp = new Razorpay({ key_id: razorpayKey as string, key_secret: razorpaySecret as string });
-    const rzpOrder = await rzp.orders.create({
-      amount: total,
-      currency: "INR",
-      receipt: number,
-      notes: { orderId: order.id },
-    });
-    await prisma.order.update({
-      where: { id: order.id },
-      data: { gatewayOrderId: rzpOrder.id },
-    });
-    return NextResponse.json({
-      mode: "razorpay",
-      orderId: order.id,
-      number: order.number,
-      razorpayOrderId: rzpOrder.id,
-      amount: total,
-      key: razorpayKey,
-      name: brand.name,
-    });
-  }
+  const text = buildWhatsAppOrderText({
+    brandName: brand.name,
+    number: order.number,
+    fullName: data.fullName,
+    phone: data.phone,
+    address: [data.line1, data.line2].filter(Boolean).join(", "),
+    pincode: data.pincode,
+    city: data.city,
+    state: data.state,
+    notes: data.notes,
+    coupon: couponRow?.code,
+    totalPaise: total,
+    items: lines.map((l) => ({
+      name: l.item.product.name,
+      quantity: l.item.quantity,
+      sku: l.item.variant?.sku ?? l.item.product.sku,
+    })),
+    siteUrl: brand.siteUrl,
+  });
+  const waUrl = waMe(brand.whatsapp, text);
 
   return NextResponse.json({
-    mode: "mock",
+    mode: "whatsapp",
     orderId: order.id,
     number: order.number,
-    amount: total,
-    notice: "Razorpay keys are not set. Using labeled mock gateway — order state machine still runs.",
+    waUrl,
+    redirect: `/checkout/success?order=${order.number}`,
   });
 }
 
 export async function GET() {
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, pay: "whatsapp" });
 }

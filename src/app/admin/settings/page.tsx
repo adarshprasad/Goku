@@ -1,5 +1,5 @@
 import { getBrand } from "@/lib/brand";
-import { saveSiteSettings } from "./actions";
+import { saveSiteSettings, changeAdminPassword } from "./actions";
 
 function Field({
   name,
@@ -39,14 +39,11 @@ export default async function AdminSettingsPage() {
           <Field name="name" label="Shop name" defaultValue={brand.name} />
           <Field name="taglineEn" label="Tagline" defaultValue={brand.taglineEn} />
         </div>
-        <Field
-          name="siteUrl"
-          label="Public website (your domain)"
-          defaultValue={brand.siteUrl}
-        />
+        <Field name="siteUrl" label="Public website (your domain)" defaultValue={brand.siteUrl} />
         <p className="-mt-4 text-xs text-[var(--muted)]">
-          Example: https://tavaruseere.com — also set AUTH_URL, NEXTAUTH_URL, and NEXT_PUBLIC_SITE_URL in the server `.env`, then rebuild.
+          Live shop: https://tavaruseere.com — also set AUTH_URL, NEXTAUTH_URL, and NEXT_PUBLIC_SITE_URL in `.env`.
         </p>
+        <Field name="checkoutIntro" label="Checkout intro (above the WhatsApp order form)" defaultValue={brand.checkoutIntro} textarea />
         <Field name="description" label="SEO description" defaultValue={brand.description} textarea />
         <Field name="heroSubtitle" label="Home hero line" defaultValue={brand.heroSubtitle} textarea />
         <label className="block text-sm">
@@ -85,6 +82,12 @@ export default async function AdminSettingsPage() {
         <input type="hidden" name="taglineKn" value={brand.taglineEn} />
         <input type="hidden" name="originState" value={brand.originState} />
         <button className="min-h-12 bg-[var(--forest)] px-8 text-[var(--ivory)]">Save brand</button>
+      </form>
+      <form action={changeAdminPassword} className="mt-16 space-y-3 border-t border-[var(--line)] pt-10">
+        <h2 className="font-serif text-2xl">Admin password</h2>
+        <p className="text-sm text-[var(--muted)]">Change this before sharing the shop URL. Use at least 8 characters.</p>
+        <input name="newPassword" type="password" required minLength={8} className="min-h-11 w-full max-w-md border border-[var(--line)] px-3" />
+        <button className="min-h-11 bg-[var(--forest)] px-5 text-[var(--ivory)]">Update password</button>
       </form>
     </div>
   );

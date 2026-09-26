@@ -110,7 +110,7 @@ export default async function HomePage() {
 
       <section className="mx-auto grid max-w-6xl gap-6 px-4 py-20 md:grid-cols-4">
         {[
-          ["Prepaid & UPI", "Razorpay checkout. We never store cards."],
+          ["Order on WhatsApp", "Confirm the drape and pay by UPI in chat. No cards on this site."],
           ["GST invoice", `HSN on every silk. GSTIN ${brand.gstin}.`],
           ["India shipping", brand.shippingIndia],
           ["WhatsApp atelier", "Drape help, measurements, and order care."],

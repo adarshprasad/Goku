@@ -2,13 +2,18 @@ import { prisma } from "@/lib/prisma";
 import { formatInr } from "@/lib/utils";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { getBrand } from "@/lib/brand";
+import { buildWhatsAppOrderText, waMe } from "@/lib/whatsapp-order";
 
 export default async function AdminOrders() {
-  const orders = await prisma.order.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { items: true },
-    take: 50,
-  });
+  const [brand, orders] = await Promise.all([
+    getBrand(),
+    prisma.order.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { items: true },
+      take: 50,
+    }),
+  ]);
 
   async function updateStatus(formData: FormData) {
     "use server";
@@ -17,7 +22,16 @@ export default async function AdminOrders() {
     const status = String(formData.get("status"));
     const trackingNumber = String(formData.get("trackingNumber") || "") || null;
     const trackingUrl = String(formData.get("trackingUrl") || "") || null;
-    await prisma.order.update({ where: { id }, data: { status, trackingNumber, trackingUrl } });
+    const paymentStatus = String(formData.get("paymentStatus") || "");
+    await prisma.order.update({
+      where: { id },
+      data: {
+        status,
+        trackingNumber,
+        trackingUrl,
+        ...(paymentStatus ? { paymentStatus } : {}),
+      },
+    });
     await prisma.orderEvent.create({
       data: { orderId: id, type: "STATUS", message: `Status → ${status}` },
     });
@@ -64,7 +78,35 @@ export default async function AdminOrders() {
                 placeholder="Tracking URL"
                 className="min-h-11 min-w-[12rem] border border-[var(--line)] px-2"
               />
-              <button className="min-h-11 border border-[var(--line)] px-4">Update</button>
+              <select name="paymentStatus" defaultValue={o.paymentStatus} className="min-h-11 border border-[var(--line)] px-2">
+                {["UNPAID", "PAID", "REFUNDED"].map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+              <a
+                href={waMe(
+                  brand.whatsapp,
+                  buildWhatsAppOrderText({
+                    brandName: brand.name,
+                    number: o.number,
+                    fullName: o.shippingName,
+                    phone: o.phone,
+                    address: [o.shippingLine1, o.shippingLine2].filter(Boolean).join(", "),
+                    pincode: o.shippingPincode,
+                    city: o.shippingCity,
+                    state: o.shippingState,
+                    notes: o.notes ?? undefined,
+                    coupon: o.couponCode ?? undefined,
+                    totalPaise: o.totalPaise,
+                    items: o.items.map((i) => ({ name: i.name, quantity: i.quantity, sku: i.sku })),
+                    siteUrl: brand.siteUrl,
+                  }),
+                )}
+                className="inline-flex min-h-11 items-center border border-[var(--forest)] px-3 text-sm"
+              >
+                WhatsApp
+              </a>
+              <button className="min-h-11 border border-[var(--line)] px-4">Save</button>
             </div>
           </form>
         ))}

@@ -10,7 +10,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Build-time Prisma generate; real DATABASE_URL is injected at runtime.
-ENV DATABASE_URL="file:./dev.db"
+ENV DATABASE_URL="postgresql://tavaru:tavaru@localhost:5432/tavaru"
 ENV AUTH_SECRET="build-placeholder-not-used-at-runtime"
 ENV AUTH_URL="http://localhost:3000"
 ENV NEXTAUTH_URL="http://localhost:3000"

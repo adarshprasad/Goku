@@ -68,7 +68,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {formatInr(product.pricePaise)}
             {off > 0 ? <span className="ml-2 text-base text-[var(--muted)] line-through">{formatInr(product.mrpPaise)}</span> : null}
           </p>
-          <p className="mt-1 text-sm text-[var(--muted)]">EMI available on Razorpay for eligible cards.</p>
+          <p className="mt-1 text-sm text-[var(--muted)]">Pay on WhatsApp after you confirm the drape. No cards on this site.</p>
           <p className="mt-3 text-sm">
             {stock > 0 ? `${stock} in atelier` : "Made to order"}
             {stock > 0 && stock <= 3 ? " · low stock" : ""}
@@ -109,9 +109,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               <input name="note" placeholder="Blouse measurements, gift wrap name…" className="mt-1 min-h-11 w-full border border-[var(--line)] bg-white px-3" />
             </label>
             <div className="flex flex-wrap gap-3">
-              <button className="min-h-12 flex-1 bg-[var(--maroon)] px-6 text-[var(--ivory)]" disabled={stock < 1 && !product.madeToOrder}>
+              <button className="min-h-12 flex-1 bg-[var(--forest)] px-6 text-[var(--ivory)]" disabled={stock < 1 && !product.madeToOrder}>
                 Add to bag
               </button>
+              <a
+                href={waLink(
+                  `Namaskara, I would like this ${brand.name} drape:\n\n${product.name}\n${formatInr(product.pricePaise)}\n${brand.siteUrl}/product/${product.slug}\n\nPlease help me confirm and pay on WhatsApp.`,
+                  brand.whatsapp,
+                )}
+                className="inline-flex min-h-12 flex-1 items-center justify-center border border-[var(--forest)] px-6 text-[var(--forest)]"
+              >
+                Order on WhatsApp
+              </a>
               <WishButton productId={product.id} />
             </div>
           </form>

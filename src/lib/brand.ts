@@ -35,14 +35,16 @@ export const brandDefaults = {
   craftImage: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1400&q=80",
   heroSubtitle: "Handloom, temple borders, and finishing — from a Bengaluru atelier.",
   privacyBody:
-    "Tavaru collects account, address, and order data to fulfil drapes. We do not store card numbers — Razorpay / Stripe process payments. WhatsApp messages are used for order care. You may request access or deletion under India’s DPDP Act.",
+    "Tavaru collects account, address, and order data to fulfil drapes. Orders are confirmed and paid on WhatsApp (UPI or bank transfer). We do not take card numbers on this website. You may request access or deletion under India’s DPDP Act.",
   termsBody:
     "By placing an order you agree that colours on screen are indicative, handloom variation is not a defect, and stitched services are made to your measurements. Title passes on delivery. Bengaluru courts have jurisdiction.",
   refundBody:
-    "Prepaid refunds return to the original gateway within 5–7 working days after QC. Store credit is available on request. COD refunds are issued as UPI transfer after we receive the unused drape.",
+    "If a WhatsApp UPI payment is reversed, we issue store credit or a bank refund after QC. Unused unstitched pieces follow the returns page.",
   shippingPolicy:
-    "Returns within the stated days for unused, unstitched pieces with tags. Stitched blouses, pre-pleating, and custom pallus are not returnable. COD orders may be refused at the door only if the packet is unopened; RTO fees may be deducted from refunds.",
+    "Returns within the stated days for unused, unstitched pieces with tags. Stitched blouses, pre-pleating, and custom pallus are not returnable.",
   siteUrl: envSiteUrl,
+  checkoutIntro:
+    "Fill your address, then WhatsApp opens with the bag already typed. Pay by UPI with the atelier — nothing is charged on this website.",
 } as const;
 
 export type SiteBrand = Record<keyof typeof brandDefaults, string>;
