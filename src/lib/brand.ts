@@ -1,5 +1,6 @@
 export const brand = {
   name: process.env.NEXT_PUBLIC_BRAND_NAME ?? "SubbaSubbi",
+  nameKn: "ಸುಬ್ಬ & ಸುಬ್ಬಿ",
   tagline: "Soft from the first day",
   description:
     "SubbaSubbi packs pre-washed newborn clothing sets for hospitals and ready sets for new mothers — jabla, muslin, swaddle, and feeding wear, delivered across India.",

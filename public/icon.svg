@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SubbaSubbi">
-  <rect width="64" height="64" rx="16" fill="#3f6f64"/>
-  <text x="32" y="40" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#f6f1ea">SS</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ಸುಬ್ಬ & ಸುಬ್ಬಿ">
+  <rect width="64" height="64" rx="16" fill="#f7fbfb"/>
+  <circle cx="32" cy="24" r="8" fill="none" stroke="#076d77" stroke-width="2"/>
+  <circle cx="26" cy="18" r="3.2" fill="none" stroke="#076d77" stroke-width="2"/>
+  <circle cx="38" cy="18" r="3.2" fill="none" stroke="#076d77" stroke-width="2"/>
+  <path d="M22 40c2 8 18 8 20 0" fill="none" stroke="#076d77" stroke-width="2" stroke-linecap="round"/>
 </svg>

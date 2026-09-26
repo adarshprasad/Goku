@@ -23,21 +23,28 @@ export default async function HomePage() {
 
   return (
     <div>
-      <section className="bg-[var(--clay-deep)] text-[var(--ivory)]">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:py-24">
+      <section className="bg-white">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:py-20">
           <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-[var(--blush)]">{brand.tagline}</p>
-            <h1 className="mt-4 font-serif text-5xl leading-[1.05] md:text-6xl">
+            <Image
+              src="/brand/lockup.png"
+              alt={`${brand.nameKn}. ${brand.tagline}`}
+              width={370}
+              height={197}
+              priority
+              className="h-auto w-full max-w-md"
+            />
+            <h1 className="mt-6 max-w-md font-serif text-4xl leading-[1.1] text-[var(--ink)] md:text-5xl">
               Pre-washed sets for hospitals and new mothers
             </h1>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-white/80">
+            <p className="mt-5 max-w-md text-base leading-relaxed text-[var(--muted)]">
               Clothing that is washed, softened, and sealed before it reaches a newborn. One door for maternity wards. One door for the mother taking a set home.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/shop?audience=mother" className="inline-flex min-h-12 items-center rounded-full bg-[var(--ivory)] px-6 text-[var(--ink)]">
+              <Link href="/shop?audience=mother" className="inline-flex min-h-12 items-center rounded-full bg-[var(--clay)] px-6 text-white">
                 Shop mother & baby sets
               </Link>
-              <Link href="/hospital" className="inline-flex min-h-12 items-center rounded-full border border-white/40 px-6">
+              <Link href="/hospital" className="inline-flex min-h-12 items-center rounded-full border border-[var(--clay)] px-6 text-[var(--clay)]">
                 Hospital orders
               </Link>
             </div>

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { brand } from "@/lib/brand";
 import { auth } from "@/auth";
@@ -29,11 +30,15 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[var(--ivory)]/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-        <Link href="/" className="min-h-11">
-          <span className="font-serif text-2xl tracking-tight text-[var(--ink)]">{brand.name}</span>
-          <span className="mt-0.5 block text-[10px] uppercase tracking-[0.22em] text-[var(--clay)]">
-            {brand.tagline}
-          </span>
+        <Link href="/" className="min-h-11 shrink-0" aria-label={brand.nameKn}>
+          <Image
+            src="/brand/wordmark.png"
+            alt={brand.nameKn}
+            width={346}
+            height={148}
+            priority
+            className="h-12 w-auto md:h-14"
+          />
         </Link>
         <nav className="hidden items-center gap-6 md:flex" aria-label="Primary">
           {nav.map((n) => (
@@ -69,8 +74,8 @@ export function SiteFooter() {
     <footer className="mt-20 border-t border-[var(--line)] bg-[var(--sand)] pb-24 md:pb-8">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-4">
         <div>
-          <p className="font-serif text-2xl text-[var(--ink)]">{brand.name}</p>
-          <p className="mt-2 text-sm text-[var(--muted)]">{brand.tagline}. Pre-washed sets for hospitals and new mothers.</p>
+          <Image src="/brand/wordmark.png" alt={brand.nameKn} width={346} height={148} className="h-16 w-auto" />
+          <p className="mt-3 text-sm text-[var(--muted)]">{brand.tagline}. Pre-washed sets for hospitals and new mothers.</p>
         </div>
         <div>
           <p className="text-xs uppercase tracking-widest text-[var(--clay)]">Visit</p>
