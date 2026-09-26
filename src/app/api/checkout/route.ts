@@ -28,7 +28,7 @@ function nextOrderNumber() {
   const d = new Date();
   const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
   const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `YJU-${ymd}-${rand}`;
+  return `SSB-${ymd}-${rand}`;
 }
 
 export async function POST(req: NextRequest) {

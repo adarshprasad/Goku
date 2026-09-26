@@ -45,7 +45,7 @@ export default async function HomePage() {
           <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-[var(--sand)]">
             <Image
               src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1200&q=80"
-              alt="Placeholder photo of a newborn — replace with Yaju photography"
+              alt="Placeholder photo of a newborn — replace with SubbaSubbi photography"
               fill
               priority
               className="object-cover"

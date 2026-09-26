@@ -1,4 +1,4 @@
-# Yaju mobile
+# SubbaSubbi mobile
 
 The storefront is an installable PWA. A native app should call the same backend.
 

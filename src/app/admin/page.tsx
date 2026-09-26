@@ -23,7 +23,7 @@ export default async function AdminHome() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="font-serif text-4xl">Yaju desk</h1>
+      <h1 className="font-serif text-4xl">SubbaSubbi desk</h1>
       <nav className="mt-4 flex flex-wrap gap-4 text-sm">
         <Link href="/admin/products" className="underline">
           Catalog

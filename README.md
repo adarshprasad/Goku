@@ -1,4 +1,4 @@
-# Yaju
+# SubbaSubbi
 
 Pre-washed newborn clothing sets for hospitals and new mothers. Next.js storefront, hospital portal, admin desk, Razorpay (or a labeled mock gateway), and an installable PWA.
 
@@ -17,9 +17,9 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Role | Email | Password |
 |------|--------|----------|
-| Mother | customer@yaju.in | yaju123 |
-| Hospital | hospital@yaju.in | yaju-hospital |
-| Admin | admin@yaju.in | yaju-admin |
+| Mother | customer@subbasubbi.in | subba123 |
+| Hospital | hospital@subbasubbi.in | subba-hospital |
+| Admin | admin@subbasubbi.in | subba-admin |
 
 Coupons: `SOFT10`, `FIRSTSET`, `FREESHIP`.
 

@@ -1,4 +1,4 @@
-const CACHE = "yaju-shell-v1";
+const CACHE = "subbasubbi-shell-v1";
 const SHELL = ["/", "/offline", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {

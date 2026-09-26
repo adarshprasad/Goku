@@ -48,7 +48,7 @@ type SeedProduct = {
 const products: SeedProduct[] = [
   {
     slug: "first-day-hospital-kit",
-    sku: "YJU-HK-001",
+    sku: "SSB-HK-001",
     name: "First-day hospital kit",
     audience: "baby",
     category: "hospital-kit",
@@ -80,7 +80,7 @@ const products: SeedProduct[] = [
   },
   {
     slug: "ward-monthly-carton",
-    sku: "YJU-HK-020",
+    sku: "SSB-HK-020",
     name: "Ward monthly carton",
     audience: "hospital",
     category: "hospital-kit",
@@ -106,7 +106,7 @@ const products: SeedProduct[] = [
   },
   {
     slug: "mother-baby-going-home",
-    sku: "YJU-MB-001",
+    sku: "SSB-MB-001",
     name: "Mother & baby going-home set",
     audience: "mother",
     category: "hospital-kit",
@@ -130,15 +130,15 @@ const products: SeedProduct[] = [
     collections: ["for-mothers", "newborn"],
     photo: pics.mother,
     variants: [
-      { name: "Mother S", sku: "YJU-MB-001-S", stock: 20 },
-      { name: "Mother M", sku: "YJU-MB-001-M", stock: 30 },
-      { name: "Mother L", sku: "YJU-MB-001-L", stock: 20 },
-      { name: "Mother XL", sku: "YJU-MB-001-XL", stock: 10 },
+      { name: "Mother S", sku: "SSB-MB-001-S", stock: 20 },
+      { name: "Mother M", sku: "SSB-MB-001-M", stock: 30 },
+      { name: "Mother L", sku: "SSB-MB-001-L", stock: 20 },
+      { name: "Mother XL", sku: "SSB-MB-001-XL", stock: 10 },
     ],
   },
   {
     slug: "snap-jabla-pack",
-    sku: "YJU-JB-003",
+    sku: "SSB-JB-003",
     name: "Snap jabla, pack of 3",
     audience: "baby",
     category: "jabla",
@@ -158,7 +158,7 @@ const products: SeedProduct[] = [
   },
   {
     slug: "muslin-nappy-pack",
-    sku: "YJU-NP-005",
+    sku: "SSB-NP-005",
     name: "Muslin nappy, pack of 5",
     audience: "baby",
     category: "nappy",
@@ -177,7 +177,7 @@ const products: SeedProduct[] = [
   },
   {
     slug: "cloud-muslin-set",
-    sku: "YJU-MS-001",
+    sku: "SSB-MS-001",
     name: "Cloud muslin set",
     audience: "baby",
     category: "muslin",
@@ -201,7 +201,7 @@ const products: SeedProduct[] = [
   },
   {
     slug: "day-one-swaddle",
-    sku: "YJU-SW-002",
+    sku: "SSB-SW-002",
     name: "Day-one swaddle, pack of 2",
     audience: "baby",
     category: "swaddle",
@@ -220,7 +220,7 @@ const products: SeedProduct[] = [
   },
   {
     slug: "hooded-bath-towel",
-    sku: "YJU-TW-001",
+    sku: "SSB-TW-001",
     name: "Hooded bath towel",
     audience: "baby",
     category: "hooded-towel",
@@ -239,7 +239,7 @@ const products: SeedProduct[] = [
   },
   {
     slug: "feeding-gown",
-    sku: "YJU-FD-001",
+    sku: "SSB-FD-001",
     name: "Feeding gown",
     audience: "mother",
     category: "feeding",
@@ -257,10 +257,10 @@ const products: SeedProduct[] = [
     collections: ["for-mothers"],
     photo: pics.mother,
     variants: [
-      { name: "S", sku: "YJU-FD-001-S", stock: 8 },
-      { name: "M", sku: "YJU-FD-001-M", stock: 12 },
-      { name: "L", sku: "YJU-FD-001-L", stock: 12 },
-      { name: "XL", sku: "YJU-FD-001-XL", stock: 8 },
+      { name: "S", sku: "SSB-FD-001-S", stock: 8 },
+      { name: "M", sku: "SSB-FD-001-M", stock: 12 },
+      { name: "L", sku: "SSB-FD-001-L", stock: 12 },
+      { name: "XL", sku: "SSB-FD-001-XL", stock: 8 },
     ],
   },
 ];
@@ -294,13 +294,13 @@ async function main() {
   await prisma.user.deleteMany();
   await prisma.setting.deleteMany();
 
-  const password = await bcrypt.hash("yaju123", 10);
-  const adminPassword = await bcrypt.hash("yaju-admin", 10);
-  const hospitalPassword = await bcrypt.hash("yaju-hospital", 10);
+  const password = await bcrypt.hash("subba123", 10);
+  const adminPassword = await bcrypt.hash("subba-admin", 10);
+  const hospitalPassword = await bcrypt.hash("subba-hospital", 10);
 
   const customer = await prisma.user.create({
     data: {
-      email: "customer@yaju.in",
+      email: "customer@subbasubbi.in",
       name: "Meera Iyer",
       passwordHash: password,
       role: "CUSTOMER",
@@ -309,15 +309,15 @@ async function main() {
   });
   await prisma.user.create({
     data: {
-      email: "admin@yaju.in",
-      name: "Yaju desk",
+      email: "admin@subbasubbi.in",
+      name: "SubbaSubbi desk",
       passwordHash: adminPassword,
       role: "ADMIN",
     },
   });
   const hospitalUser = await prisma.user.create({
     data: {
-      email: "hospital@yaju.in",
+      email: "hospital@subbasubbi.in",
       name: "Ward sister",
       passwordHash: hospitalPassword,
       role: "HOSPITAL",
@@ -419,7 +419,7 @@ async function main() {
         images: {
           create: [0, 1].map((i) => ({
             url: photo(p.photo),
-            alt: `Placeholder photo for ${p.name}. Replace with Yaju product photography.`,
+            alt: `Placeholder photo for ${p.name}. Replace with SubbaSubbi product photography.`,
             sortOrder: i,
           })),
         },
@@ -452,7 +452,7 @@ async function main() {
       name: "Gift note",
       description: "A short note packed with a mother set.",
       pricePaise: 0,
-      sku: "YJU-ADD-NOTE",
+      sku: "SSB-ADD-NOTE",
     },
   });
 
@@ -507,7 +507,7 @@ async function main() {
         slug: "what-to-pack-for-the-hospital",
         title: "What to pack for the hospital",
         excerpt: "A short list for the bag you actually carry.",
-        body: "For the baby: jabla, nappies, two swaddles, a towel. For you: a feeding gown that opens in front, and a set you can leave on after discharge. Yaju sells that as one going-home set.",
+        body: "For the baby: jabla, nappies, two swaddles, a towel. For you: a feeding gown that opens in front, and a set you can leave on after discharge. SubbaSubbi sells that as one going-home set.",
         image: photo(pics.mother),
       },
     ],
@@ -532,7 +532,7 @@ async function main() {
     ],
   });
 
-  console.log("Seeded Yaju. customer@yaju.in / yaju123 · admin@yaju.in / yaju-admin · hospital@yaju.in / yaju-hospital");
+  console.log("Seeded SubbaSubbi. customer@subbasubbi.in / subba123 · admin@subbasubbi.in / subba-admin · hospital@subbasubbi.in / subba-hospital");
 }
 
 main()

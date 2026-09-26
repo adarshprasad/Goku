@@ -89,10 +89,10 @@ export async function toggleWishlist(productId: string) {
   const { auth } = await import("@/auth");
   const session = await auth();
   const jar = await cookies();
-  let token = jar.get("yaju_wish")?.value;
+  let token = jar.get("subbasubbi_wish")?.value;
   if (!token) {
     token = crypto.randomUUID();
-    jar.set("yaju_wish", token, { httpOnly: true, path: "/", maxAge: 60 * 60 * 24 * 180, sameSite: "lax" });
+    jar.set("subbasubbi_wish", token, { httpOnly: true, path: "/", maxAge: 60 * 60 * 24 * 180, sameSite: "lax" });
   }
 
   const existing = session?.user?.id

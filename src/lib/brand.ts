@@ -1,16 +1,16 @@
 export const brand = {
-  name: process.env.NEXT_PUBLIC_BRAND_NAME ?? "Yaju",
+  name: process.env.NEXT_PUBLIC_BRAND_NAME ?? "SubbaSubbi",
   tagline: "Soft from the first day",
   description:
-    "Yaju packs pre-washed newborn clothing sets for hospitals and ready sets for new mothers — jabla, muslin, swaddle, and feeding wear, delivered across India.",
-  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "hello@yaju.in",
+    "SubbaSubbi packs pre-washed newborn clothing sets for hospitals and ready sets for new mothers — jabla, muslin, swaddle, and feeding wear, delivered across India.",
+  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "hello@subbasubbi.in",
   supportPhone: process.env.NEXT_PUBLIC_SUPPORT_PHONE ?? "+91 80 4567 2100",
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "918045672100",
   address:
     process.env.NEXT_PUBLIC_BUSINESS_ADDRESS ??
-    "Yaju, 18 Infant Lane, Indiranagar, Bengaluru, Karnataka 560038",
+    "SubbaSubbi, 18 Infant Lane, Indiranagar, Bengaluru, Karnataka 560038",
   gstin: process.env.NEXT_PUBLIC_GSTIN ?? "29AAAAA0000A1Z5",
-  instagram: "https://instagram.com/yaju",
+  instagram: "https://instagram.com/subbasubbi",
   returnDays: 7,
   shippingIndia: "3–7 days across India",
   shippingIntl: "10–21 days for international orders",

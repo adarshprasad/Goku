@@ -121,7 +121,7 @@ export function BottomNav() {
 }
 
 export function WhatsAppButton() {
-  const href = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Hello Yaju, I need help choosing a newborn set.")}`;
+  const href = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Hello SubbaSubbi, I need help choosing a newborn set.")}`;
   return (
     <a
       href={href}

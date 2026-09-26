@@ -4,7 +4,7 @@ import { randomBytes } from "crypto";
 import { auth } from "@/auth";
 import { unitPricePaise } from "@/lib/pricing";
 
-const COOKIE = "yaju_cart";
+const COOKIE = "subbasubbi_cart";
 
 async function readToken() {
   return (await cookies()).get(COOKIE)?.value;

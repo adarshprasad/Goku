@@ -5,7 +5,7 @@ import { ProductCard } from "@/components/product-card";
 
 export default async function WishlistPage() {
   const session = await auth();
-  const token = (await cookies()).get("yaju_wish")?.value;
+  const token = (await cookies()).get("subbasubbi_wish")?.value;
   const items = await prisma.wishlistItem.findMany({
     where: session?.user?.id ? { userId: session.user.id } : { token: token ?? "__none__" },
     include: { product: { include: { images: { orderBy: { sortOrder: "asc" } } } } },
