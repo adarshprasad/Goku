@@ -99,22 +99,33 @@ There is **no Razorpay / card checkout**. Place order → WhatsApp chat with ord
 
 ## Fedora (shop + Postgres + tunnel)
 
+You do **not** need Docker. Install Postgres with dnf:
+
 ```bash
 cd ~/huduku
 git fetch origin
 git checkout cursor/whatsapp-postgres-939e
-# Postgres (Docker):
-docker compose up -d
-# Put DATABASE_URL=postgresql://tavaru:tavaru@localhost:5432/tavaru in .env
-# First time only (wipes data):
-npx prisma db push
-npm run db:seed
+git pull
+sudo bash scripts/fedora-postgres.sh
+```
+
+That installs PostgreSQL, starts it, and creates database `tavaru` / user `tavaru`. Then:
+
+```bash
+# If .env does not exist yet:
+cp -n .env.example .env
+# Use 127.0.0.1 (not localhost) so Postgres uses a password, not Unix ident:
+# DATABASE_URL=postgresql://tavaru:tavaru@127.0.0.1:5432/tavaru
+nano .env
 openssl rand -base64 32   # paste into AUTH_SECRET and NEXTAUTH_SECRET
+npx prisma db push
+npm run db:seed           # first time only — wipes orders
 npm run build
-# keep these two running:
 nohup npm start > nohup.out 2>&1 &
 nohup cloudflared tunnel run tavaru > ~/cloudflared.log 2>&1 &
 ```
+
+If you prefer Docker later: `sudo dnf install -y docker docker-compose` then `sudo systemctl enable --now docker` and `sudo docker compose up -d`. Native Postgres above is enough to sell.
 
 If you already have SQLite `dev.db` with catalog you care about, export products from admin after seed, or keep a copy of the old file — `db:seed` on Postgres is a fresh shop.
 
