@@ -7,12 +7,12 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
-    localPatterns: [
-      { pathname: "/products/**" },
-      { pathname: "/brand/**" },
-      { pathname: "/uploads/**" },
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "tavaruseere.com" },
+      { protocol: "https", hostname: "www.tavaruseere.com" },
     ],
+    localPatterns: [{ pathname: "/**" }],
   },
 };
 

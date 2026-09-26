@@ -65,9 +65,15 @@ export async function SiteHeader() {
           <Link href="/wishlist" className="min-h-11 min-w-11 inline-flex items-center text-[var(--ivory)]/85">
             Wish{wish ? ` (${wish})` : ""}
           </Link>
-          <Link href={session ? "/account" : "/login"} className="min-h-11 inline-flex items-center text-[var(--ivory)]/85">
-            {session ? "Account" : "Sign in"}
-          </Link>
+          {session ? (
+            <Link href="/account" className="min-h-11 inline-flex items-center text-[var(--ivory)]/85">
+              Account
+            </Link>
+          ) : (
+            <a href="/login" className="min-h-11 inline-flex items-center text-[var(--ivory)]/85">
+              Sign in
+            </a>
+          )}
           <Link
             href="/cart"
             className="inline-flex min-h-11 min-w-11 items-center justify-center border border-[var(--ivory)] px-4 text-[var(--ivory)]"
@@ -123,7 +129,7 @@ export async function BottomNav() {
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
     ...(staff ? [{ href: "/admin", label: "Admin" }] : [{ href: "/wishlist", label: "Wish" }]),
-    { href: "/account", label: "Account" },
+    { href: session ? "/account" : "/login", label: session ? "Account" : "Sign in" },
   ];
   return (
     <nav
@@ -131,9 +137,9 @@ export async function BottomNav() {
       aria-label="Mobile"
     >
       {items.map((i) => (
-        <Link key={i.href} href={i.href} className="flex min-h-14 flex-1 items-center justify-center text-sm">
+        <a key={i.href} href={i.href} className="flex min-h-14 flex-1 items-center justify-center text-sm">
           {i.label}
-        </Link>
+        </a>
       ))}
     </nav>
   );

@@ -125,7 +125,15 @@ nohup npm start > nohup.out 2>&1 &
 nohup cloudflared tunnel run tavaru > ~/cloudflared.log 2>&1 &
 ```
 
-If you prefer Docker later: `sudo dnf install -y docker docker-compose` then `sudo systemctl enable --now docker` and `sudo docker compose up -d`. Native Postgres above is enough to sell.
+If Sign in shows “Application error”, the old Next process is still serving mixed files. Stop it, rebuild, start:
+
+```bash
+cd ~/huduku
+sudo bash scripts/fedora-postgres.sh   # only if Postgres is not already running
+bash scripts/fedora-restart-shop.sh
+```
+
+Hard-refresh the browser (Ctrl+Shift+R). In Cloudflare, turn off **Rocket Loader** for this site (Speed → Optimization).
 
 If you already have SQLite `dev.db` with catalog you care about, export products from admin after seed, or keep a copy of the old file — `db:seed` on Postgres is a fresh shop.
 
