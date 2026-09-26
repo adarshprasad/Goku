@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildWhatsAppProductText, whatsappDigits } from "./whatsapp-order";
+import { waLink } from "./utils";
 
 describe("whatsapp order text", () => {
   it("strips phone formatting", () => {
@@ -7,6 +8,13 @@ describe("whatsapp order text", () => {
     expect(whatsappDigits("9686726381")).toBe("919686726381");
     expect(whatsappDigits("+91 96867 26381")).toBe("919686726381");
     expect(whatsappDigits("919686726381")).toBe("919686726381");
+  });
+
+  it("builds a WhatsApp send URL with digits only", () => {
+    const url = waLink("hello", "+91 96867 26381");
+    expect(url).toContain("api.whatsapp.com/send");
+    expect(url).toContain("phone=919686726381");
+    expect(url).not.toMatch(/\+91/);
   });
 
   it("includes product name and pay on WhatsApp", () => {

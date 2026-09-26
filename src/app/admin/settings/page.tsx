@@ -63,7 +63,7 @@ export default async function AdminSettingsPage() {
             <Field name="supportPhone" label="Public phone" defaultValue={brand.supportPhone} />
             <Field name="whatsapp" label="WhatsApp number (the phone that has WhatsApp)" defaultValue={brand.whatsapp} />
             <p className="-mt-2 text-xs text-[var(--muted)] md:col-span-2">
-              Use the number that already opens WhatsApp on your phone. A 10-digit Indian mobile is enough. Plus and spaces are stripped. If WhatsApp says it could not look up the number, that SIM is not on WhatsApp.
+              Open WhatsApp on that phone → Settings → your profile: the number must be 96867 26381. Do not test the shop button on that same phone — WhatsApp cannot start a chat with itself. Ask a second phone to tap WhatsApp on the site. If a second phone also cannot look it up, this SIM is not registered on WhatsApp.
             </p>
             <Field name="gstin" label="GSTIN" defaultValue={brand.gstin} />
           </div>

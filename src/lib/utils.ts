@@ -30,6 +30,13 @@ export function whatsappDigits(raw?: string | null) {
 
 export function waLink(text?: string, phone?: string) {
   const n = whatsappDigits(phone ?? process.env.NEXT_PUBLIC_WHATSAPP_NUMBER);
-  const q = text ? `?text=${encodeURIComponent(text)}` : "";
-  return `https://wa.me/${n}${q}`;
+  const params = new URLSearchParams({ phone: n, type: "phone_number", app_absent: "0" });
+  if (text) params.set("text", text);
+  return `https://api.whatsapp.com/send/?${params.toString()}`;
+}
+
+export function formatWhatsAppDisplay(raw?: string | null) {
+  const d = whatsappDigits(raw);
+  if (d.startsWith("91") && d.length === 12) return `+91 ${d.slice(2, 7)} ${d.slice(7)}`;
+  return `+${d}`;
 }

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getBrand } from "@/lib/brand";
-import { waLink } from "@/lib/utils";
+import { formatWhatsAppDisplay, waLink } from "@/lib/utils";
 import { auth } from "@/auth";
 import { getCart } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
@@ -156,7 +156,7 @@ export async function WhatsAppButton() {
       rel="noreferrer"
       className="fixed bottom-20 right-4 z-40 inline-flex min-h-12 items-center border border-[var(--forest)] bg-[var(--ivory)] px-4 text-sm text-[var(--forest)] md:bottom-6"
     >
-      WhatsApp
+      WhatsApp {formatWhatsAppDisplay(brand.whatsapp)}
     </a>
   );
 }
