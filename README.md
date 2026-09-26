@@ -133,7 +133,14 @@ sudo bash scripts/fedora-postgres.sh   # only if Postgres is not already running
 bash scripts/fedora-restart-shop.sh
 ```
 
-Hard-refresh the browser (Ctrl+Shift+R). In Cloudflare, turn off **Rocket Loader** for this site (Speed → Optimization).
+Hard-refresh the browser (Ctrl+Shift+R). Cloudflare is **not** inside `ps` unless you start the tunnel:
+
+```bash
+nohup cloudflared tunnel run tavaru > ~/cloudflared.log 2>&1 &
+tail -f ~/cloudflared.log
+```
+
+The shop on this PC is `http://127.0.0.1:3000`. The public name `https://tavaruseere.com` only works while **both** `next-server` and `cloudflared` are running.
 
 If you already have SQLite `dev.db` with catalog you care about, export products from admin after seed, or keep a copy of the old file — `db:seed` on Postgres is a fresh shop.
 
