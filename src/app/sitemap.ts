@@ -8,7 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     prisma.collection.findMany({ select: { slug: true } }),
     prisma.journalPost.findMany({ select: { slug: true, publishedAt: true } }),
   ]);
-  const staticPaths = ["", "/shop", "/about", "/journal", "/support"].map((p) => ({
+  const staticPaths = ["", "/shop", "/about", "/journal", "/support", "/hospital", "/wash", "/hospital-kit"].map((p) => ({
     url: `${siteUrl}${p || "/"}`,
     lastModified: new Date(),
   }));

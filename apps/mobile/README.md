@@ -1,20 +1,14 @@
-# Huduku mobile (Expo)
+# Yaju mobile
 
-The storefront API is the same as the web app.
+The storefront is an installable PWA. A native app should call the same backend.
 
 ## Contract
 
-- `GET /shop` catalog HTML; JSON later at `/api/catalog` (add when native list ships)
-- Auth: NextAuth JWT cookie on web; native should use email/password against `/api/auth/*` or a dedicated `/api/mobile/login`
-- Checkout v1: open `WebView` to `{SITE_URL}/checkout` with the cart cookie / magic link
-- Payments: Razorpay native SDK is a follow-on; WebView checkout is acceptable for app v1
+- `GET /api/catalog` returns published sets. `priceBreaks` is empty unless the caller has an approved hospital session. Hospital-only prices are omitted for everyone else.
+- Auth: email and password through Auth.js.
+- Checkout v1: open a web view to `/checkout`.
+- Payments: Razorpay in that web view. A native SDK can come later.
 
-## Start later
+## Visual tokens
 
-```bash
-npx create-expo-app@latest . --template blank-typescript
-# screens: Home, Catalog, PDP, Cart, Account
-# reuse SITE_URL from .env
-```
-
-Keep visual tokens: maroon `#6b1d2a`, ivory `#f7f1e8`, gold `#c4a574`, serif headlines.
+Sage `#3f6f64`, ivory `#f6f1ea`, sand `#efe4d6`, ink `#24302c`.

@@ -29,9 +29,11 @@ export default async function LoginPage({
     <div className="mx-auto max-w-md px-4 py-16">
       <h1 className="font-serif text-4xl">Sign in</h1>
       <p className="mt-2 text-sm text-[var(--muted)]">
-        Demo customer <code>customer@huduku.in</code> / <code>huduku123</code>
+        Mother <code>customer@yaju.in</code> / <code>yaju123</code>
         <br />
-        Admin <code>admin@huduku.in</code> / <code>huduku-admin</code>
+        Hospital <code>hospital@yaju.in</code> / <code>yaju-hospital</code>
+        <br />
+        Admin <code>admin@yaju.in</code> / <code>yaju-admin</code>
       </p>
       <form action={login} className="mt-8 space-y-4">
         <input name="email" type="email" required placeholder="Email" className="min-h-11 w-full border border-[var(--line)] px-3" />

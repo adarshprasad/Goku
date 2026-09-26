@@ -2,8 +2,9 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { randomBytes } from "crypto";
 import { auth } from "@/auth";
+import { unitPricePaise } from "@/lib/pricing";
 
-const COOKIE = "huduku_cart";
+const COOKIE = "yaju_cart";
 
 async function readToken() {
   return (await cookies()).get(COOKIE)?.value;
@@ -73,14 +74,28 @@ export function parseAddons(raw: string): string[] {
   }
 }
 
+export async function hospitalApprovedFor(userId?: string | null) {
+  if (!userId) return false;
+  const account = await prisma.hospitalAccount.findUnique({ where: { userId } });
+  return account?.status === "APPROVED";
+}
+
 export async function cartTotals(
   cart: NonNullable<Awaited<ReturnType<typeof getCart>>>,
 ) {
+  const session = await auth();
+  const hospitalApproved = await hospitalApprovedFor(session?.user?.id);
   const addons = await prisma.addon.findMany();
   const addonMap = new Map(addons.map((a) => [a.slug, a]));
   let subtotal = 0;
   const lines = cart.items.map((item) => {
-    const unit = item.variant?.pricePaise ?? item.product.pricePaise;
+    const retail = item.variant?.pricePaise ?? item.product.pricePaise;
+    const unit = unitPricePaise({
+      retailPaise: retail,
+      priceBreaks: item.product.priceBreaks,
+      quantity: item.quantity,
+      hospitalApproved,
+    });
     const extra = parseAddons(item.addons).reduce(
       (s, slug) => s + (addonMap.get(slug)?.pricePaise ?? 0),
       0,
@@ -89,5 +104,5 @@ export async function cartTotals(
     subtotal += line;
     return { item, unit, extra, line };
   });
-  return { subtotal, lines, addons };
+  return { subtotal, lines, addons, hospitalApproved };
 }

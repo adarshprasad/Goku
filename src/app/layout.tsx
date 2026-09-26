@@ -1,16 +1,17 @@
-import { Cormorant_Garamond, Outfit } from "next/font/google";
+import { Fraunces, Nunito } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SiteHeader, SiteFooter, BottomNav, WhatsAppButton } from "@/components/chrome";
+import { PwaRegister } from "@/components/pwa-register";
 import { brand, siteUrl } from "@/lib/brand";
 
-const serif = Cormorant_Garamond({
+const serif = Fraunces({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["500", "600"],
   variable: "--font-serif",
 });
 
-const sans = Outfit({
+const sans = Nunito({
   subsets: ["latin"],
   variable: "--font-sans",
 });
@@ -18,7 +19,7 @@ const sans = Outfit({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${brand.name} — ${brand.taglineEn}`,
+    default: `${brand.name} — ${brand.tagline}`,
     template: `%s · ${brand.name}`,
   },
   description: brand.description,
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#6b1d2a",
+  themeColor: "#3f6f64",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SiteFooter />
         <BottomNav />
         <WhatsAppButton />
+        <PwaRegister />
       </body>
     </html>
   );

@@ -6,10 +6,10 @@ import { prisma } from "@/lib/prisma";
 
 const nav = [
   { href: "/shop", label: "Shop" },
-  { href: "/collections/wedding", label: "Wedding" },
-  { href: "/collections/handloom", label: "Handloom" },
-  { href: "/journal", label: "Journal" },
-  { href: "/about", label: "Atelier" },
+  { href: "/shop?audience=mother", label: "For mothers" },
+  { href: "/hospital", label: "Hospitals" },
+  { href: "/wash", label: "Wash promise" },
+  { href: "/about", label: "About" },
 ];
 
 export async function SiteHeader() {
@@ -29,28 +29,24 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[var(--ivory)]/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-        <Link href="/" className="min-h-11 min-w-11">
-          <span className="font-serif text-2xl tracking-tight text-[var(--maroon)]">{brand.name}</span>
-          <span className="mt-0.5 block text-[10px] uppercase tracking-[0.22em] text-[var(--gold-deep)]">
-            Bengaluru atelier
+        <Link href="/" className="min-h-11">
+          <span className="font-serif text-2xl tracking-tight text-[var(--ink)]">{brand.name}</span>
+          <span className="mt-0.5 block text-[10px] uppercase tracking-[0.22em] text-[var(--clay)]">
+            {brand.tagline}
           </span>
         </Link>
         <nav className="hidden items-center gap-6 md:flex" aria-label="Primary">
           {nav.map((n) => (
-            <Link
-              key={n.href}
-              href={n.href}
-              className="text-sm text-[var(--muted)] transition hover:text-[var(--maroon)]"
-            >
+            <Link key={n.href} href={n.href} className="text-sm text-[var(--muted)] transition hover:text-[var(--ink)]">
               {n.label}
             </Link>
           ))}
         </nav>
         <div className="flex items-center gap-3 text-sm">
-          <Link href="/shop?q=" className="hidden min-h-11 items-center sm:flex">
+          <Link href="/shop" className="hidden min-h-11 items-center sm:flex">
             Search
           </Link>
-          <Link href="/wishlist" className="min-h-11 min-w-11 inline-flex items-center">
+          <Link href="/wishlist" className="hidden min-h-11 items-center sm:inline-flex">
             Wish{wish ? ` (${wish})` : ""}
           </Link>
           <Link href={session ? "/account" : "/login"} className="min-h-11 inline-flex items-center">
@@ -58,7 +54,7 @@ export async function SiteHeader() {
           </Link>
           <Link
             href="/cart"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-[var(--maroon)] px-4 text-[var(--ivory)]"
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--clay)] px-4 text-white"
           >
             Bag {count}
           </Link>
@@ -70,30 +66,31 @@ export async function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-20 border-t border-[var(--line)] bg-[#f3eadc] pb-24 md:pb-8">
+    <footer className="mt-20 border-t border-[var(--line)] bg-[var(--sand)] pb-24 md:pb-8">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-4">
         <div>
-          <p className="font-serif text-2xl text-[var(--maroon)]">{brand.name}</p>
-          <p className="mt-2 font-serif italic text-[var(--gold-deep)]">{brand.taglineKn}</p>
-          <p className="mt-1 text-sm text-[var(--muted)]">{brand.taglineEn}</p>
+          <p className="font-serif text-2xl text-[var(--ink)]">{brand.name}</p>
+          <p className="mt-2 text-sm text-[var(--muted)]">{brand.tagline}. Pre-washed sets for hospitals and new mothers.</p>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-widest text-[var(--gold-deep)]">Visit</p>
+          <p className="text-xs uppercase tracking-widest text-[var(--clay)]">Visit</p>
           <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{brand.address}</p>
           <p className="mt-2 text-sm">{brand.supportEmail}</p>
           <p className="text-sm">{brand.supportPhone}</p>
         </div>
         <div className="flex flex-col gap-2 text-sm">
-          <p className="text-xs uppercase tracking-widest text-[var(--gold-deep)]">Client care</p>
+          <p className="text-xs uppercase tracking-widest text-[var(--clay)]">Care</p>
           <Link href="/support">Shipping & returns</Link>
+          <Link href="/wash">Fabric & wash promise</Link>
+          <Link href="/hospital-kit">What’s in a hospital kit</Link>
           <Link href="/account/orders">Track order</Link>
           <Link href="/legal/privacy">Privacy</Link>
           <Link href="/legal/terms">Terms</Link>
           <Link href="/legal/refund">Refunds</Link>
         </div>
         <div className="text-sm text-[var(--muted)]">
-          <p className="text-xs uppercase tracking-widest text-[var(--gold-deep)]">Promise</p>
-          <p className="mt-3">Prepaid UPI & cards. GST invoice. {brand.shippingIndia}. COD in eligible pincodes.</p>
+          <p className="text-xs uppercase tracking-widest text-[var(--clay)]">Promise</p>
+          <p className="mt-3">UPI, cards, netbanking, wallets, and cash on delivery. GST invoice. {brand.shippingIndia}.</p>
           <p className="mt-2">GSTIN {brand.gstin}</p>
         </div>
       </div>
@@ -105,7 +102,8 @@ export function BottomNav() {
   const items = [
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
-    { href: "/wishlist", label: "Wish" },
+    { href: "/hospital", label: "Hospital" },
+    { href: "/cart", label: "Cart" },
     { href: "/account", label: "Account" },
   ];
   return (
@@ -114,7 +112,7 @@ export function BottomNav() {
       aria-label="Mobile"
     >
       {items.map((i) => (
-        <Link key={i.href} href={i.href} className="flex min-h-14 flex-1 items-center justify-center text-sm">
+        <Link key={i.href} href={i.href} className="flex min-h-14 flex-1 items-center justify-center text-xs">
           {i.label}
         </Link>
       ))}
@@ -123,7 +121,7 @@ export function BottomNav() {
 }
 
 export function WhatsAppButton() {
-  const href = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Namaskara, I would like help choosing a Huduku drape.")}`;
+  const href = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Hello Yaju, I need help choosing a newborn set.")}`;
   return (
     <a
       href={href}

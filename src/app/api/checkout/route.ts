@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
-import { getOrCreateCart, cartTotals } from "@/lib/cart";
+import { getOrCreateCart, cartTotals, hospitalApprovedFor } from "@/lib/cart";
 import { applyCoupon, type CouponInput } from "@/lib/coupons";
 import { COD_FEE_PAISE, codEligible, shippingForPincode, gstRateForApparel } from "@/lib/money";
 import { decrementStockAndMarkPaid } from "@/lib/orders";
@@ -28,7 +28,7 @@ function nextOrderNumber() {
   const d = new Date();
   const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
   const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `HDK-${ymd}-${rand}`;
+  return `YJU-${ymd}-${rand}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -156,6 +156,7 @@ export async function POST(req: NextRequest) {
       shippingPincode: data.pincode,
       shippingCountry: data.country,
       notes: data.notes,
+      channel: (await hospitalApprovedFor(session?.user?.id)) ? "HOSPITAL" : "RETAIL",
       items: {
         create: lines.map((l) => ({
           productId: l.item.productId,

@@ -1,17 +1,17 @@
 import { brand } from "@/lib/brand";
 
+export const metadata = { title: "About" };
+
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <p className="text-xs uppercase tracking-[0.22em] text-[var(--gold-deep)]">{brand.taglineKn}</p>
-      <h1 className="mt-3 font-serif text-5xl">Huduku atelier</h1>
+      <p className="text-xs uppercase tracking-[0.22em] text-[var(--clay)]">{brand.tagline}</p>
+      <h1 className="mt-3 font-serif text-5xl">About {brand.name}</h1>
       <p className="mt-6 text-lg leading-relaxed text-[var(--muted)]">
-        Huduku means to seek. We seek weaves with a place of origin — and finishing that respects them. The studio sits on
-        Lavelle Road, Bengaluru: fall, pico, blouse, and a quiet room to drape before a wedding.
+        Yaju started with a simple gap. Hospitals wanted a washed set of clothes ready for a baby who had just been born. New mothers wanted the same set for the bag they take to the hospital, plus something soft to wear while feeding.
       </p>
       <p className="mt-4 leading-relaxed text-[var(--muted)]">
-        We work with GI clusters in Varanasi, Kanchipuram, Chanderi, and Paithan. Powerloom is labelled. Gold is antique where
-        the loom allows. Returns are seven days on unused, unstitched pieces; stitched blouses and custom pallus stay with you.
+        We sell two ways. Maternity wards order kits in bulk, with a GST invoice and a delivery to the ward. Mothers order single sets online. Every baby garment is pre-washed, softened, and sealed before it leaves us.
       </p>
       <address className="mt-10 not-italic text-sm">
         {brand.address}

@@ -3,412 +3,266 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const img = (id: string, sig: string) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1400&q=80&${sig}`;
+const photo = (id: string) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1400&q=80`;
 
-const photos = [
-  "photo-1610030469983-98e550d6193c",
-  "photo-1583391733956-6c78276477e2",
-  "photo-1594631661960-0ec055273205",
-  "photo-1617627143750-d86bc21e42bb",
-  "photo-1609106595812-96c62b6d0d8d",
-  "photo-1596484552836-8a3995d48c1c",
-  "photo-1572804013309-59a88b7e92f1",
-  "photo-1617019114583-affb34d1b3cd",
-  "photo-1567401893414-76b7b1e5a7a5",
-  "photo-1595777457583-95e059d581b8",
-];
+const pics = {
+  baby: "photo-1515488042361-ee00e0ddd4e4",
+  crib: "photo-1522771739844-6a9f6d5f14af",
+  feet: "photo-1555252333-9f8e92e65df9",
+  hold: "photo-1471286174890-9c112ffca5b4",
+  mother: "photo-1492725764893-90b379c2b6e7",
+  soft: "photo-1522771930-78848d9293e8",
+  cloth: "photo-1612423284934-2850a4ea6b0f",
+  knit: "photo-1617331721458-bd3bd6898f29",
+};
+
+type Piece = { name: string; qty: number };
+type Break = { minQty: number; pricePaise: number };
 
 type SeedProduct = {
   slug: string;
   sku: string;
   name: string;
-  type: string;
+  audience: "hospital" | "mother" | "baby";
+  category: string;
+  ageRange: string;
+  packOf: number;
   description: string;
-  craftStory: string;
-  artisanNote?: string;
-  giTag?: string;
+  pieces: Piece[];
   price: number;
   mrp: number;
-  weave: string;
   fabric: string;
-  work: string;
-  occasion: string;
   color: string;
-  colorSecondary?: string;
-  motif?: string;
-  border?: string;
-  pallu?: string;
-  lengthMeters?: number;
-  blousePiece?: boolean;
-  weightFeel: string;
   care: string;
   featured?: boolean;
+  hospitalOnly?: boolean;
+  minOrderQty?: number;
+  breaks?: Break[];
   stock: number;
   collections: string[];
-  photo: number;
+  photo: string;
+  variants?: { name: string; sku: string; stock: number; price?: number }[];
 };
 
 const products: SeedProduct[] = [
   {
-    slug: "varanasi-moon-banarasi",
-    sku: "HDK-BAN-001",
-    name: "Varanasi Moon Banarasi",
-    type: "Saree",
+    slug: "first-day-hospital-kit",
+    sku: "YJU-HK-001",
+    name: "First-day hospital kit",
+    audience: "baby",
+    category: "hospital-kit",
+    ageRange: "Newborn",
+    packOf: 1,
     description:
-      "A moonlight kadhua Banarasi in ivory silk, woven with antique gold zari jaal. The pallu falls like temple steps — measured, luminous, ceremonial.",
-    craftStory:
-      "Kadhua is a discontinuous brocade technique from Varanasi where each motif is woven separately. A single jaal can take weeks on a pit loom.",
-    artisanNote: "Woven by the Ansari atelier, Peeli Kothi.",
-    giTag: "Banaras Brocades and Sarees",
-    price: 28400, mrp: 32800,
-    weave: "Banarasi", fabric: "Silk", work: "Zari", occasion: "Wedding",
-    color: "Ivory", colorSecondary: "Gold", motif: "Jaal", border: "Temple", pallu: "Kadhua",
-    weightFeel: "Heavy", care: "Dry clean only", featured: true, stock: 4,
-    collections: ["wedding", "bridal", "handloom", "new-in"], photo: 0,
+      "The set a maternity ward hands a newborn: jabla, muslin nappies, swaddles, and a hooded towel. Every piece is pre-washed, softened, and sealed.",
+    pieces: [
+      { name: "Snap jabla", qty: 3 },
+      { name: "Muslin nappy", qty: 5 },
+      { name: "Swaddle", qty: 2 },
+      { name: "Hooded towel", qty: 1 },
+    ],
+    price: 899,
+    mrp: 1299,
+    fabric: "Cotton muslin",
+    color: "Ivory",
+    care: "Machine wash cold, dry in shade. Already washed once before packing.",
+    featured: true,
+    minOrderQty: 10,
+    breaks: [
+      { minQty: 10, pricePaise: 74900 },
+      { minQty: 50, pricePaise: 69900 },
+      { minQty: 100, pricePaise: 64900 },
+    ],
+    stock: 400,
+    collections: ["hospital-kits", "newborn"],
+    photo: pics.baby,
   },
   {
-    slug: "kanchi-flame-kanjivaram",
-    sku: "HDK-KAN-002",
-    name: "Kanchi Flame Kanjivaram",
-    type: "Saree",
+    slug: "ward-monthly-carton",
+    sku: "YJU-HK-020",
+    name: "Ward monthly carton",
+    audience: "hospital",
+    category: "hospital-kit",
+    ageRange: "Newborn",
+    packOf: 20,
     description:
-      "Temple-border Kanjivaram in deep maroon with dual-shade korvai. Gold checks catch light as you walk — a classic for muhurtham.",
-    craftStory:
-      "Korvai joins contrasting body and border with interlocking weft. Kanchipuram weavers still work this join by hand.",
-    artisanNote: "Silk from the Kanchipuram co-operative.",
-    giTag: "Kancheepuram Silk",
-    price: 31200, mrp: 36500,
-    weave: "Kanjivaram", fabric: "Silk", work: "Zari", occasion: "Wedding",
-    color: "Maroon", colorSecondary: "Gold", motif: "Checks", border: "Temple", pallu: "Broad zari",
-    weightFeel: "Heavy", care: "Dry clean only", featured: true, stock: 3,
-    collections: ["wedding", "bridal", "handloom"], photo: 1,
+      "Twenty sealed first-day kits in one carton for the maternity store. Hospital accounts only. Contents match the first-day kit.",
+    pieces: [{ name: "First-day hospital kit", qty: 20 }],
+    price: 0,
+    mrp: 0,
+    fabric: "Cotton muslin",
+    color: "Ivory",
+    care: "Keep sealed until the birth. Each inner set is pre-washed.",
+    hospitalOnly: true,
+    minOrderQty: 1,
+    breaks: [
+      { minQty: 1, pricePaise: 1299000 },
+      { minQty: 5, pricePaise: 1199000 },
+    ],
+    stock: 40,
+    collections: ["hospital-kits"],
+    photo: pics.soft,
   },
   {
-    slug: "chanderi-river-mist",
-    sku: "HDK-CHA-003",
-    name: "Chanderi River Mist",
-    type: "Saree",
+    slug: "mother-baby-going-home",
+    sku: "YJU-MB-001",
+    name: "Mother & baby going-home set",
+    audience: "mother",
+    category: "hospital-kit",
+    ageRange: "Newborn",
+    packOf: 1,
     description:
-      "Translucent Chanderi in mist grey with silver bootis. Light enough for a noon wedding, formal enough for an evening aarti.",
-    craftStory: "Chanderi handloom blends silk and cotton for a paper-fine drape with a dull-gold gleam.",
-    giTag: "Chanderi Sarees",
-    price: 9800, mrp: 12400,
-    weave: "Chanderi", fabric: "Silk-cotton", work: "Booti", occasion: "Festive",
-    color: "Grey", colorSecondary: "Silver", motif: "Booti", border: "Slim zari", pallu: "Plain with booti",
-    weightFeel: "Light", care: "Gentle dry clean", featured: true, stock: 8,
-    collections: ["festive", "handloom", "everyday"], photo: 2,
+      "What a new mother packs for the hospital and the ride home: a feeding gown for her, and a pre-washed set for the baby.",
+    pieces: [
+      { name: "Feeding gown", qty: 1 },
+      { name: "Jabla", qty: 2 },
+      { name: "Muslin nappy", qty: 3 },
+      { name: "Swaddle", qty: 1 },
+    ],
+    price: 1499,
+    mrp: 1999,
+    fabric: "Cotton",
+    color: "Blush",
+    care: "Machine wash cold. Baby pieces are pre-washed before packing.",
+    featured: true,
+    stock: 80,
+    collections: ["for-mothers", "newborn"],
+    photo: pics.mother,
+    variants: [
+      { name: "Mother S", sku: "YJU-MB-001-S", stock: 20 },
+      { name: "Mother M", sku: "YJU-MB-001-M", stock: 30 },
+      { name: "Mother L", sku: "YJU-MB-001-L", stock: 20 },
+      { name: "Mother XL", sku: "YJU-MB-001-XL", stock: 10 },
+    ],
   },
   {
-    slug: "pastel-organza-garden",
-    sku: "HDK-ORG-004",
-    name: "Pastel Organza Garden",
-    type: "Saree",
-    description:
-      "Sheer organza in pistachio with hand-painted lotuses. Wear with a lined blouse; the drape photographs like watercolour.",
-    craftStory: "Hand-painted organza from a Jaipur studio that treats each pallu as a miniature landscape.",
-    price: 14600, mrp: 17200,
-    weave: "Designer", fabric: "Organza", work: "Hand-painted", occasion: "Party",
-    color: "Pistachio", colorSecondary: "Ivory", motif: "Lotus", border: "Painted vine", pallu: "Garden panel",
-    blousePiece: true, weightFeel: "Light", care: "Dry clean only", featured: true, stock: 6,
-    collections: ["festive", "new-in"], photo: 3,
+    slug: "snap-jabla-pack",
+    sku: "YJU-JB-003",
+    name: "Snap jabla, pack of 3",
+    audience: "baby",
+    category: "jabla",
+    ageRange: "0–3 months",
+    packOf: 3,
+    description: "Front-snap jablas in soft cotton. Pre-washed so the first wear is not a stiff new cloth.",
+    pieces: [{ name: "Snap jabla", qty: 3 }],
+    price: 449,
+    mrp: 599,
+    fabric: "Cotton",
+    color: "Assorted prints",
+    care: "Machine wash cold, dry in shade.",
+    featured: true,
+    stock: 120,
+    collections: ["newborn"],
+    photo: pics.feet,
   },
   {
-    slug: "tussar-earth-story",
-    sku: "HDK-TUS-005",
-    name: "Tussar Earth Story",
-    type: "Saree",
-    description:
-      "Raw tussar in warm sand with kantha running stitch along the border. A weekday heirloom — texture over shine.",
-    craftStory: "Gopalpur tussar is reeled from wild silk cocoons; kantha is added in Bolpur.",
-    price: 7200, mrp: 8900,
-    weave: "Tussar", fabric: "Tussar silk", work: "Kantha", occasion: "Office",
-    color: "Sand", motif: "Running stitch", border: "Kantha", pallu: "Plain",
-    weightFeel: "Medium", care: "Gentle wash, dry in shade", stock: 10,
-    collections: ["everyday", "handloom"], photo: 4,
+    slug: "muslin-nappy-pack",
+    sku: "YJU-NP-005",
+    name: "Muslin nappy, pack of 5",
+    audience: "baby",
+    category: "nappy",
+    ageRange: "Newborn",
+    packOf: 5,
+    description: "Four-layer muslin langots for the first months. Washed before they are packed.",
+    pieces: [{ name: "Muslin nappy", qty: 5 }],
+    price: 299,
+    mrp: 399,
+    fabric: "Muslin",
+    color: "White",
+    care: "Hot wash allowed. Dry in the sun.",
+    stock: 0,
+    collections: ["newborn", "muslin"],
+    photo: pics.cloth,
   },
   {
-    slug: "linen-coast-indigo",
-    sku: "HDK-LIN-006",
-    name: "Linen Coast Indigo",
-    type: "Saree",
-    description:
-      "European-flax linen dyed in natural indigo, with a hand-drawn temple border in charcoal. Breathes in Bengaluru summers.",
-    craftStory: "Indigo vats in Bagru; linen mill-woven then block-bordered.",
-    price: 6400, mrp: 7800,
-    weave: "Linen", fabric: "Linen", work: "Block print", occasion: "Casual",
-    color: "Indigo", motif: "Temple line", border: "Block", pallu: "Graded indigo",
-    weightFeel: "Light", care: "Gentle wash", stock: 12,
-    collections: ["everyday", "new-in"], photo: 5,
+    slug: "cloud-muslin-set",
+    sku: "YJU-MS-001",
+    name: "Cloud muslin set",
+    audience: "baby",
+    category: "muslin",
+    ageRange: "0–3 months",
+    packOf: 1,
+    description: "A swaddle, a burp cloth, and a light wrap in the same pre-washed muslin.",
+    pieces: [
+      { name: "Swaddle", qty: 1 },
+      { name: "Burp cloth", qty: 2 },
+      { name: "Wrapper", qty: 1 },
+    ],
+    price: 799,
+    mrp: 999,
+    fabric: "Muslin",
+    color: "Sand",
+    care: "Gentle wash, dry in shade.",
+    featured: true,
+    stock: 60,
+    collections: ["muslin", "newborn"],
+    photo: pics.crib,
   },
   {
-    slug: "paithani-peacock-dusk",
-    sku: "HDK-PAI-007",
-    name: "Paithani Peacock Dusk",
-    type: "Saree",
-    description:
-      "Classic Paithani with a peacock pallu in magenta and green. Oblique tapestry weave — the gold looks hammered, not printed.",
-    craftStory: "Paithan weavers use tapestry interlocking so the pallu has no floats on the reverse.",
-    giTag: "Paithani Sarees",
-    price: 42000, mrp: 48000,
-    weave: "Paithani", fabric: "Silk", work: "Zari", occasion: "Wedding",
-    color: "Magenta", colorSecondary: "Green", motif: "Peacock", border: "Narali", pallu: "Peacock",
-    weightFeel: "Heavy", care: "Dry clean only", featured: true, stock: 2,
-    collections: ["wedding", "bridal", "handloom"], photo: 6,
+    slug: "day-one-swaddle",
+    sku: "YJU-SW-002",
+    name: "Day-one swaddle, pack of 2",
+    audience: "baby",
+    category: "swaddle",
+    ageRange: "Newborn",
+    packOf: 2,
+    description: "Two breathable swaddles, pre-washed and sealed, sized for a newborn curl.",
+    pieces: [{ name: "Swaddle", qty: 2 }],
+    price: 549,
+    mrp: 749,
+    fabric: "Muslin",
+    color: "Ivory",
+    care: "Machine wash cold.",
+    stock: 70,
+    collections: ["newborn", "muslin"],
+    photo: pics.hold,
   },
   {
-    slug: "jamdani-cloud-white",
-    sku: "HDK-JAM-008",
-    name: "Jamdani Cloud White",
-    type: "Saree",
-    description:
-      "Muslin jamdani with extra-weft flowers floating on white. A summer wedding essential — cool against skin.",
-    craftStory: "Jamdani motifs are inlaid on the loom without a mechanical jacquard.",
-    price: 11800, mrp: 13500,
-    weave: "Jamdani", fabric: "Cotton muslin", work: "Extra-weft", occasion: "Festive",
-    color: "White", colorSecondary: "Ivory", motif: "Floral", border: "Fine jamdani", pallu: "Scattered buti",
-    weightFeel: "Light", care: "Gentle wash", stock: 7,
-    collections: ["festive", "handloom"], photo: 7,
+    slug: "hooded-bath-towel",
+    sku: "YJU-TW-001",
+    name: "Hooded bath towel",
+    audience: "baby",
+    category: "hooded-towel",
+    ageRange: "0–3 months",
+    packOf: 1,
+    description: "A small hooded towel in cotton terry, washed once so the pile is not scratchy.",
+    pieces: [{ name: "Hooded towel", qty: 1 }],
+    price: 399,
+    mrp: 499,
+    fabric: "Cotton terry",
+    color: "Sage",
+    care: "Machine wash warm.",
+    stock: 50,
+    collections: ["newborn"],
+    photo: pics.knit,
   },
   {
-    slug: "ikkat-telangana-sunset",
-    sku: "HDK-IKK-009",
-    name: "Ikkat Telangana Sunset",
-    type: "Saree",
-    description:
-      "Double ikat geometry in rust, black, and cream. The blur of the resist is the signature — not a flaw.",
-    craftStory: "Pochampally double ikat ties warp and weft before dyeing.",
-    giTag: "Pochampally Ikat",
-    price: 8900, mrp: 10500,
-    weave: "Ikkat", fabric: "Silk-cotton", work: "Ikat", occasion: "Festive",
-    color: "Rust", colorSecondary: "Black", motif: "Geometry", border: "Ikat band", pallu: "Double ikat",
-    weightFeel: "Medium", care: "Dry clean preferred", stock: 5,
-    collections: ["festive", "handloom"], photo: 8,
+    slug: "feeding-gown",
+    sku: "YJU-FD-001",
+    name: "Feeding gown",
+    audience: "mother",
+    category: "feeding",
+    ageRange: "Newborn",
+    packOf: 1,
+    description: "A front-open cotton gown for hospital nights and the first weeks of feeding at home.",
+    pieces: [{ name: "Feeding gown", qty: 1 }],
+    price: 999,
+    mrp: 1499,
+    fabric: "Cotton",
+    color: "Clay",
+    care: "Machine wash cold.",
+    featured: true,
+    stock: 40,
+    collections: ["for-mothers"],
+    photo: pics.mother,
+    variants: [
+      { name: "S", sku: "YJU-FD-001-S", stock: 8 },
+      { name: "M", sku: "YJU-FD-001-M", stock: 12 },
+      { name: "L", sku: "YJU-FD-001-L", stock: 12 },
+      { name: "XL", sku: "YJU-FD-001-XL", stock: 8 },
+    ],
   },
-  {
-    slug: "bandhani-gujarat-coral",
-    sku: "HDK-BAN-010",
-    name: "Bandhani Gujarat Coral",
-    type: "Saree",
-    description:
-      "Gajji silk bandhani in coral with fine dots and a mirror-work blouse piece. Festive without heaviness.",
-    craftStory: "Each dot is tied by hand before the dye bath in Jamnagar.",
-    price: 10200, mrp: 12800,
-    weave: "Bandhani", fabric: "Gajji silk", work: "Tie-dye", occasion: "Festive",
-    color: "Coral", motif: "Bandhani dots", border: "Zari", pallu: "Bandhani",
-    weightFeel: "Medium", care: "Dry clean only", stock: 6,
-    collections: ["festive", "new-in"], photo: 9,
-  },
-  {
-    slug: "crepe-midnight-sequin",
-    sku: "HDK-CRE-011",
-    name: "Crepe Midnight Sequin",
-    type: "Saree",
-    description:
-      "Midnight crepe with sparse sequin constellations. A reception drape that does not fight jewellery.",
-    craftStory: "Sequins are hand-placed in a Bengaluru atelier — density tapers toward the fall.",
-    price: 13400, mrp: 15900,
-    weave: "Designer", fabric: "Crepe", work: "Sequence", occasion: "Party",
-    color: "Navy", motif: "Constellation", border: "None", pallu: "Sequin fade",
-    weightFeel: "Medium", care: "Dry clean only", stock: 9,
-    collections: ["festive"], photo: 0,
-  },
-  {
-    slug: "georgette-rose-embroidery",
-    sku: "HDK-GEO-012",
-    name: "Georgette Rose Embroidery",
-    type: "Saree",
-    description:
-      "Dusty rose georgette with resham roses on the pallu and a scalloped border. Soft drape for cocktail hours.",
-    craftStory: "Resham embroidery from a Lucknow karigar who trained in chikankari before moving to colour.",
-    price: 12100, mrp: 14800,
-    weave: "Designer", fabric: "Georgette", work: "Embroidery", occasion: "Party",
-    color: "Rose", motif: "Roses", border: "Scallop", pallu: "Embroidered",
-    weightFeel: "Light", care: "Dry clean only", stock: 7,
-    collections: ["festive", "new-in"], photo: 1,
-  },
-  {
-    slug: "kanjivaram-peacock-green",
-    sku: "HDK-KAN-013",
-    name: "Kanjivaram Peacock Green",
-    type: "Saree",
-    description:
-      "Emerald Kanjivaram with magenta korvai border — a South Indian wedding palette that photographs richly.",
-    craftStory: "Contrast borders are a Kanchipuram signature; the join is the craft.",
-    giTag: "Kancheepuram Silk",
-    price: 26800, mrp: 31000,
-    weave: "Kanjivaram", fabric: "Silk", work: "Zari", occasion: "Wedding",
-    color: "Emerald", colorSecondary: "Magenta", motif: "Annams", border: "Korvai", pallu: "Broad zari",
-    weightFeel: "Heavy", care: "Dry clean only", stock: 3,
-    collections: ["wedding", "bridal", "handloom"], photo: 2,
-  },
-  {
-    slug: "banarasi-wine-jangla",
-    sku: "HDK-BAN-014",
-    name: "Banarasi Wine Jangla",
-    type: "Saree",
-    description:
-      "Wine silk with all-over jangla vines in gold. Bridal without the weight of a lehenga — sit, walk, bless.",
-    craftStory: "Jangla is an all-over vine pattern historically reserved for wedding trousseaus.",
-    giTag: "Banaras Brocades and Sarees",
-    price: 35600, mrp: 41000,
-    weave: "Banarasi", fabric: "Silk", work: "Zari", occasion: "Wedding",
-    color: "Wine", colorSecondary: "Gold", motif: "Jangla", border: "Konia", pallu: "Shikargah",
-    weightFeel: "Heavy", care: "Dry clean only", featured: true, stock: 2,
-    collections: ["wedding", "bridal"], photo: 3,
-  },
-  {
-    slug: "chanderi-marigold",
-    sku: "HDK-CHA-015",
-    name: "Chanderi Marigold",
-    type: "Saree",
-    description:
-      "Mustard Chanderi with gold bootis — a Navratri and Haldi favourite. Pairs with uncut kundan.",
-    craftStory: "Mustard is vat-dyed on silk-cotton in Chanderi town.",
-    giTag: "Chanderi Sarees",
-    price: 8600, mrp: 10200,
-    weave: "Chanderi", fabric: "Silk-cotton", work: "Booti", occasion: "Festive",
-    color: "Mustard", motif: "Booti", border: "Zari", pallu: "Gold stripe",
-    weightFeel: "Light", care: "Gentle dry clean", stock: 11,
-    collections: ["festive", "everyday"], photo: 4,
-  },
-  {
-    slug: "organza-ivory-zardozi",
-    sku: "HDK-ORG-016",
-    name: "Organza Ivory Zardozi",
-    type: "Saree",
-    description:
-      "Ivory organza with restrained zardozi on pallu and blouse. A civil ceremony piece — quiet luxury.",
-    craftStory: "Zardozi in metal thread from a Lucknow workshop using antique gold plate.",
-    price: 18900, mrp: 22500,
-    weave: "Designer", fabric: "Organza", work: "Zardozi", occasion: "Wedding",
-    color: "Ivory", colorSecondary: "Gold", motif: "Paisley", border: "Zardozi", pallu: "Zardozi panel",
-    weightFeel: "Medium", care: "Dry clean only", stock: 4,
-    collections: ["wedding", "bridal", "new-in"], photo: 5,
-  },
-  {
-    slug: "cotton-handloom-coral-check",
-    sku: "HDK-COT-017",
-    name: "Cotton Handloom Coral Check",
-    type: "Saree",
-    description:
-      "Fine cotton checks in coral and cream from a Tamil Nadu co-op. Office to dinner without a change of jewellery.",
-    craftStory: "Coimbatore mill-spun yarn, handloomed in 6-yard warps.",
-    price: 4200, mrp: 5200,
-    weave: "Handloom cotton", fabric: "Cotton", work: "None", occasion: "Office",
-    color: "Coral", colorSecondary: "Cream", motif: "Checks", border: "Pin", pallu: "Check",
-    weightFeel: "Light", care: "Gentle wash", stock: 14,
-    collections: ["everyday", "handloom"], photo: 6,
-  },
-  {
-    slug: "linen-rose-dust",
-    sku: "HDK-LIN-018",
-    name: "Linen Rose Dust",
-    type: "Saree",
-    description:
-      "Dusty rose linen with a raw selvedge border. For women who prefer matte fabric and gold hoops.",
-    craftStory: "Belgian flax, dyed in Panipat, finished in Bengaluru.",
-    price: 6800, mrp: 8100,
-    weave: "Linen", fabric: "Linen", work: "None", occasion: "Casual",
-    color: "Rose", motif: "Plain", border: "Selvedge", pallu: "Self",
-    weightFeel: "Light", care: "Gentle wash", stock: 9,
-    collections: ["everyday"], photo: 7,
-  },
-  {
-    slug: "banarasi-black-kadhua",
-    sku: "HDK-BAN-019",
-    name: "Banarasi Black Kadhua",
-    type: "Saree",
-    description:
-      "Black silk with sparse kadhua florals in antique gold. Evening wear that reads couture, not costume.",
-    craftStory: "Black takes longer to dye evenly on mulberry silk; the kadhua is kept sparse on purpose.",
-    giTag: "Banaras Brocades and Sarees",
-    price: 29800, mrp: 34000,
-    weave: "Banarasi", fabric: "Silk", work: "Zari", occasion: "Party",
-    color: "Black", colorSecondary: "Gold", motif: "Floral kadhua", border: "Slim", pallu: "Kadhua",
-    weightFeel: "Medium", care: "Dry clean only", featured: true, stock: 3,
-    collections: ["festive", "wedding"], photo: 8,
-  },
-  {
-    slug: "kanjivaram-mustard-temple",
-    sku: "HDK-KAN-020",
-    name: "Kanjivaram Mustard Temple",
-    type: "Saree",
-    description:
-      "Mustard Kanjivaram with a wide temple border in maroon. A festival workhorse — durable silk, true colour.",
-    giTag: "Kancheepuram Silk",
-    craftStory: "Temple borders echo gopuram silhouettes; mustard is a harvest colour in Tamil Nadu.",
-    price: 22400, mrp: 25900,
-    weave: "Kanjivaram", fabric: "Silk", work: "Zari", occasion: "Festive",
-    color: "Mustard", colorSecondary: "Maroon", motif: "Temple", border: "Temple", pallu: "Zari",
-    weightFeel: "Heavy", care: "Dry clean only", stock: 5,
-    collections: ["festive", "handloom"], photo: 9,
-  },
-  {
-    slug: "silk-blouse-ivory-brocade",
-    sku: "HDK-BLO-021",
-    name: "Ivory Brocade Blouse",
-    type: "Blouse",
-    description:
-      "Ready blouse in ivory brocade. Princess seam, lined, hook-and-eye back. Pair with organza or Banarasi.",
-    craftStory: "Cut in our Bengaluru studio on Banarasi leftover looms — waste-nothing tailoring.",
-    price: 4800, mrp: 5600,
-    weave: "Banarasi", fabric: "Silk", work: "Zari", occasion: "Wedding",
-    color: "Ivory", motif: "Brocade", border: "None", pallu: "n/a",
-    lengthMeters: 0, blousePiece: false, weightFeel: "Medium", care: "Dry clean only", stock: 8,
-    collections: ["wedding"], photo: 0,
-  },
-  {
-    slug: "temple-coin-necklace",
-    sku: "HDK-JWL-022",
-    name: "Temple Coin Necklace",
-    type: "Jewelry",
-    description:
-      "Gold-plated temple coins on a short necklace. Closes the look on Kanjivaram and Banarasi without competing.",
-    craftStory: "Inspired by antique kasu malai; plated in a Hallmark-adjacent workshop in Chennai.",
-    price: 3200, mrp: 3900,
-    weave: "Designer", fabric: "Metal", work: "Temple", occasion: "Festive",
-    color: "Gold", motif: "Coin", border: "n/a", pallu: "n/a",
-    lengthMeters: 0, blousePiece: false, weightFeel: "Light", care: "Wipe with dry cloth", stock: 20,
-    collections: ["festive", "wedding"], photo: 1,
-  },
-  {
-    slug: "silk-care-kit",
-    sku: "HDK-KIT-023",
-    name: "Silk Care Kit",
-    type: "Care kit",
-    description:
-      "Muslin storage bag, cedar block, and a pH-neutral silk wipe. Keep zari from tarnish and folds from setting.",
-    craftStory: "Packed in Bengaluru; muslin from the same mills as our cotton handlooms.",
-    price: 980, mrp: 1200,
-    weave: "Designer", fabric: "Muslin", work: "None", occasion: "Casual",
-    color: "Ivory", motif: "None", border: "n/a", pallu: "n/a",
-    lengthMeters: 0, blousePiece: false, weightFeel: "Light", care: "Keep dry", stock: 40,
-    collections: ["everyday"], photo: 2,
-  },
-  {
-    slug: "huduku-gift-card",
-    sku: "HDK-GFT-024",
-    name: "Huduku Gift Card — ₹5,000",
-    type: "Gift card",
-    description:
-      "A digital atelier credit. Perfect when you know her taste is better than your guess. Delivered by email.",
-    craftStory: "Redeemable on any Huduku drape, blouse, or finishing service.",
-    price: 5000, mrp: 5000,
-    weave: "Designer", fabric: "Digital", work: "None", occasion: "Casual",
-    color: "Maroon", motif: "Wordmark", border: "n/a", pallu: "n/a",
-    lengthMeters: 0, blousePiece: false, weightFeel: "Light", care: "n/a", stock: 99,
-    collections: ["new-in"], photo: 3,
-  },
-];
-
-const collections = [
-  { slug: "wedding", name: "Wedding", tagline: "Muhurtham silks", description: "Banarasi, Kanjivaram, and Paithani for the days that become family photographs.", image: img(photos[1], "c=wedding") },
-  { slug: "bridal", name: "Bridal", tagline: "The first drape", description: "Heavier zari, temple borders, and pallus that carry a blessing.", image: img(photos[0], "c=bridal") },
-  { slug: "festive", name: "Festive", tagline: "Light that holds colour", description: "Chanderi, organza, bandhani, and party crepes for Navratri to New Year.", image: img(photos[3], "c=festive") },
-  { slug: "everyday", name: "Everyday", tagline: "Handloom for weekdays", description: "Linen, cotton, and tussar — beauty that survives a full calendar.", image: img(photos[5], "c=everyday") },
-  { slug: "handloom", name: "Handloom", tagline: "GI weaves, named artisans", description: "Pieces with a place of origin and a pair of hands you can name.", image: img(photos[4], "c=handloom") },
-  { slug: "new-in", name: "New-in", tagline: "This moon’s arrivals", description: "The newest warps from Varanasi, Kanchipuram, and our Bengaluru studio.", image: img(photos[2], "c=new") },
 ];
 
 async function main() {
@@ -436,44 +290,94 @@ async function main() {
   await prisma.address.deleteMany();
   await prisma.measurementProfile.deleteMany();
   await prisma.auditLog.deleteMany();
+  await prisma.hospitalAccount.deleteMany();
   await prisma.user.deleteMany();
   await prisma.setting.deleteMany();
 
-  const adminHash = await bcrypt.hash("huduku-admin", 10);
-  const customerHash = await bcrypt.hash("huduku123", 10);
-
-  await prisma.user.create({
-    data: {
-      email: "admin@huduku.in",
-      name: "Huduku Atelier",
-      passwordHash: adminHash,
-      role: "ADMIN",
-      phone: "+918045672100",
-    },
-  });
+  const password = await bcrypt.hash("yaju123", 10);
+  const adminPassword = await bcrypt.hash("yaju-admin", 10);
+  const hospitalPassword = await bcrypt.hash("yaju-hospital", 10);
 
   const customer = await prisma.user.create({
     data: {
-      email: "customer@huduku.in",
-      name: "Ananya Rao",
-      passwordHash: customerHash,
+      email: "customer@yaju.in",
+      name: "Meera Iyer",
+      passwordHash: password,
       role: "CUSTOMER",
-      phone: "+919900112233",
+      phone: "9845011122",
+    },
+  });
+  await prisma.user.create({
+    data: {
+      email: "admin@yaju.in",
+      name: "Yaju desk",
+      passwordHash: adminPassword,
+      role: "ADMIN",
+    },
+  });
+  const hospitalUser = await prisma.user.create({
+    data: {
+      email: "hospital@yaju.in",
+      name: "Ward sister",
+      passwordHash: hospitalPassword,
+      role: "HOSPITAL",
+      phone: "9845099900",
+      gstin: "29AAAAA0000A1Z5",
+    },
+  });
+  await prisma.hospitalAccount.create({
+    data: {
+      userId: hospitalUser.id,
+      hospitalName: "Indiranagar Maternity",
+      city: "Bengaluru",
+      gstin: "29AAAAA0000A1Z5",
+      contactName: "Ward sister",
+      phone: "9845099900",
+      maternityBeds: 24,
+      monthlyBirths: 80,
+      wardLine1: "Maternity ward, 2nd floor",
+      wardCity: "Bengaluru",
+      wardState: "KA",
+      wardPincode: "560038",
+      status: "APPROVED",
+      priceTier: "STANDARD",
     },
   });
 
-  await prisma.address.create({
-    data: {
-      userId: customer.id,
-      fullName: "Ananya Rao",
-      phone: "9900112233",
-      line1: "42, 4th Cross, Indiranagar",
-      city: "Bengaluru",
-      state: "KA",
-      pincode: "560038",
-      isDefault: true,
+  const collections = [
+    {
+      slug: "hospital-kits",
+      name: "Hospital kits",
+      tagline: "For the ward",
+      description: "Pre-washed newborn sets packed for maternity wards.",
+      image: photo(pics.baby),
+      sortOrder: 1,
     },
-  });
+    {
+      slug: "for-mothers",
+      name: "For new mothers",
+      tagline: "Take-home sets",
+      description: "Going-home sets and feeding wear.",
+      image: photo(pics.mother),
+      sortOrder: 2,
+    },
+    {
+      slug: "newborn",
+      name: "Newborn",
+      tagline: "First months",
+      description: "Jabla, nappy, swaddle, and towel.",
+      image: photo(pics.soft),
+      sortOrder: 3,
+    },
+    {
+      slug: "muslin",
+      name: "Muslin",
+      tagline: "Breathable layers",
+      description: "Pre-washed muslin for warm rooms.",
+      image: photo(pics.crib),
+      sortOrder: 4,
+    },
+  ];
 
   const colMap: Record<string, string> = {};
   for (const c of collections) {
@@ -481,93 +385,81 @@ async function main() {
     colMap[c.slug] = row.id;
   }
 
-  const productIds: Record<string, string> = {};
-
+  const ids: Record<string, string> = {};
   for (const p of products) {
     const created = await prisma.product.create({
       data: {
         slug: p.slug,
         sku: p.sku,
         name: p.name,
-        type: p.type,
+        type: "Set",
+        audience: p.audience,
+        category: p.category,
+        ageRange: p.ageRange,
+        packOf: p.packOf,
+        preWashed: true,
+        contents: JSON.stringify(p.pieces),
+        minOrderQty: p.minOrderQty ?? 1,
+        hospitalOnly: p.hospitalOnly ?? false,
+        priceBreaks: JSON.stringify(p.breaks ?? []),
         description: p.description,
-        craftStory: p.craftStory,
-        artisanNote: p.artisanNote,
-        giTag: p.giTag,
+        craftStory: p.pieces.map((piece) => `${piece.qty} × ${piece.name}`).join(", "),
         pricePaise: p.price * 100,
         mrpPaise: p.mrp * 100,
-        weave: p.weave,
+        hsn: "6111",
+        weave: p.category,
         fabric: p.fabric,
-        work: p.work,
-        occasion: p.occasion,
+        work: p.audience,
+        occasion: p.ageRange,
         color: p.color,
-        colorSecondary: p.colorSecondary,
-        motif: p.motif,
-        border: p.border,
-        pallu: p.pallu,
-        lengthMeters: p.lengthMeters ?? 5.5,
-        blousePiece: p.blousePiece ?? p.type === "Saree",
-        weightFeel: p.weightFeel,
+        weightFeel: `Pack of ${p.packOf}`,
         care: p.care,
-        modelHeightCm: p.type === "Saree" ? 170 : null,
-        modelBlouseSize: p.type === "Saree" ? "M (36)" : null,
         featured: p.featured ?? false,
+        inStock: p.stock > 0,
         images: {
-          create: [0, 1, 2].map((i) => ({
-            url: img(photos[(p.photo + i) % photos.length], `p=${p.sku}-${i}`),
-            alt: `${p.name} — view ${i + 1}`,
+          create: [0, 1].map((i) => ({
+            url: photo(p.photo),
+            alt: `Placeholder photo for ${p.name}. Replace with Yaju product photography.`,
             sortOrder: i,
-            kind: i === 2 ? "detail" : "gallery",
           })),
         },
         variants: {
-          create:
-            p.type === "Blouse"
-              ? ["32", "34", "36", "38"].map((size, i) => ({
-                  name: `Bust ${size}`,
-                  sku: `${p.sku}-${size}`,
-                  blouseSize: size,
-                  stock: i === 2 ? p.stock : 2,
-                }))
-              : [
-                  {
-                    name: p.color,
-                    sku: `${p.sku}-DEF`,
-                    color: p.color,
-                    stock: p.stock,
-                  },
-                ],
+          create: (p.variants ?? [{ name: `Pack of ${p.packOf}`, sku: `${p.sku}-DEF`, stock: p.stock }]).map((v) => ({
+            name: v.name,
+            sku: v.sku,
+            stock: v.stock,
+            pricePaise: v.price ? v.price * 100 : null,
+            color: p.color,
+          })),
         },
-        collections: {
-          create: p.collections.map((slug) => ({ collectionId: colMap[slug] })),
-        },
+        collections: { create: p.collections.map((slug) => ({ collectionId: colMap[slug] })) },
       },
     });
-    productIds[p.slug] = created.id;
+    ids[p.slug] = created.id;
   }
 
   await prisma.productPairing.createMany({
     data: [
-      { productId: productIds["varanasi-moon-banarasi"], pairedId: productIds["silk-blouse-ivory-brocade"] },
-      { productId: productIds["varanasi-moon-banarasi"], pairedId: productIds["temple-coin-necklace"] },
-      { productId: productIds["pastel-organza-garden"], pairedId: productIds["silk-blouse-ivory-brocade"] },
-      { productId: productIds["kanchi-flame-kanjivaram"], pairedId: productIds["temple-coin-necklace"] },
+      { productId: ids["mother-baby-going-home"], pairedId: ids["feeding-gown"] },
+      { productId: ids["first-day-hospital-kit"], pairedId: ids["hooded-bath-towel"] },
+      { productId: ids["cloud-muslin-set"], pairedId: ids["day-one-swaddle"] },
     ],
   });
 
-  await prisma.addon.createMany({
-    data: [
-      { slug: "fall-pico", name: "Fall & pico", description: "Cotton fall and pico finish, 4–5 working days.", pricePaise: 45000, sku: "HDK-ADD-FALL" },
-      { slug: "pre-pleating", name: "Pre-pleating", description: "Knife pleats stitched for a ready drape.", pricePaise: 120000, sku: "HDK-ADD-PLEAT" },
-      { slug: "blouse-stitching", name: "Blouse stitching", description: "Studio stitch from standard size or your measurements.", pricePaise: 180000, sku: "HDK-ADD-BLOUSE" },
-      { slug: "gift-wrap", name: "Gift wrap + note", description: "Muslin wrap and a handwritten Kannada/English note.", pricePaise: 25000, sku: "HDK-ADD-GIFT" },
-    ],
+  await prisma.addon.create({
+    data: {
+      slug: "gift-note",
+      name: "Gift note",
+      description: "A short note packed with a mother set.",
+      pricePaise: 0,
+      sku: "YJU-ADD-NOTE",
+    },
   });
 
   await prisma.coupon.createMany({
     data: [
-      { code: "HUDUKU10", type: "PERCENT", value: 10, minSubtotal: 500000, maxDiscount: 400000, active: true },
-      { code: "FIRSTDRAPE", type: "FIXED", value: 75000, minSubtotal: 800000, active: true },
+      { code: "SOFT10", type: "PERCENT", value: 10, minSubtotal: 100000, maxDiscount: 30000, active: true },
+      { code: "FIRSTSET", type: "FIXED", value: 10000, minSubtotal: 79900, active: true },
       { code: "FREESHIP", type: "FREE_SHIP", value: 0, minSubtotal: 0, active: true },
     ],
   });
@@ -575,28 +467,28 @@ async function main() {
   await prisma.review.createMany({
     data: [
       {
-        productId: productIds["varanasi-moon-banarasi"],
+        productId: ids["first-day-hospital-kit"],
         userId: customer.id,
-        authorName: "Ananya Rao",
+        authorName: "Ananya",
         rating: 5,
-        title: "The pallu is architecture",
-        body: "Zari is antique, not brassy. Draped for my cousin’s muhurtham in Mysuru — compliments all evening.",
+        title: "Soft on day one",
+        body: "The jabla did not feel new-stiff. We used the swaddle the night we came home.",
         verified: true,
       },
       {
-        productId: productIds["linen-coast-indigo"],
-        authorName: "Meera K",
+        productId: ids["mother-baby-going-home"],
+        authorName: "Farheen",
         rating: 5,
-        title: "Weekday silk alternative",
-        body: "Indigo held after two gentle washes. The temple line is crisp. I wear it to the studio.",
+        title: "Everything for the hospital bag",
+        body: "The feeding gown and the baby set arrived washed and packed. I did not have to shop twice.",
         verified: true,
       },
       {
-        productId: productIds["chanderi-river-mist"],
-        authorName: "Divya S",
+        productId: ids["feeding-gown"],
+        authorName: "Smita",
         rating: 4,
-        title: "Light as claimed",
-        body: "True to the mist grey on screen. Needed a lined blouse, which Huduku stitched in five days.",
+        title: "Easy at 3 am",
+        body: "Front opening is simple. Cotton stayed soft after three washes.",
         verified: true,
       },
     ],
@@ -605,35 +497,28 @@ async function main() {
   await prisma.journalPost.createMany({
     data: [
       {
-        slug: "how-to-drape-a-kanjivaram",
-        title: "How to drape a Kanjivaram so the korvai shows",
-        excerpt: "Temple borders deserve a 1.5-pleat start and a pallu that sits on the left shoulder, not the arm.",
-        body: "Start with a well-tucked first turn at the right waist. Keep pleats no wider than three fingers so the checks stay graphic. The korvai join should sit just below the blouse hem — that is the craft, not a seam to hide.\n\nHuduku’s pre-pleating service locks this geometry if you would rather walk into the hall already finished.",
-        image: img(photos[1], "j=drape"),
+        slug: "why-we-wash-before-we-pack",
+        title: "Why we wash before we pack",
+        excerpt: "Newborn skin should not be the first thing to rinse a new cloth.",
+        body: "Each baby piece is washed, rinsed, dried in shade, and sealed. Hospitals receive sets, not loose garments that still need a home wash. Mothers get the same promise on retail sets.",
+        image: photo(pics.soft),
       },
       {
-        slug: "banarasi-kadhua-vs-cutwork",
-        title: "Kadhua or cutwork: reading a Banarasi",
-        excerpt: "Turn the saree over. If the motif is as finished on the reverse, you are holding kadhua.",
-        body: "Cutwork clips extra weft; kadhua weaves each flower independently. The latter costs time and therefore gold. At Huduku we label both honestly — including when a piece is powerloom with hand finishing.",
-        image: img(photos[0], "j=kadhua"),
-      },
-      {
-        slug: "fall-pico-and-why-it-matters",
-        title: "Fall, pico, and why your hem should not fray at a wedding",
-        excerpt: "A cotton fall gives the pleats a spine. Pico seals the edge. Neither is optional on silk.",
-        body: "We use cotton fall, never satin, on silk — it grips the petticoat. Pico is rolled, not overlocked, on handloom so the edge can still breathe. Add it at checkout; we return the saree ready to tuck.",
-        image: img(photos[4], "j=fall"),
+        slug: "what-to-pack-for-the-hospital",
+        title: "What to pack for the hospital",
+        excerpt: "A short list for the bag you actually carry.",
+        body: "For the baby: jabla, nappies, two swaddles, a towel. For you: a feeding gown that opens in front, and a set you can leave on after discharge. Yaju sells that as one going-home set.",
+        image: photo(pics.mother),
       },
     ],
   });
 
   await prisma.banner.create({
     data: {
-      title: "The monsoon edit",
-      subtitle: "Chanderi, linen, and organza for rooms with old fans and new jewellery.",
-      image: img(photos[2], "b=hero"),
-      href: "/collections/festive",
+      title: "Soft from the first day",
+      subtitle: "Pre-washed sets for hospitals and new mothers.",
+      image: photo(pics.baby),
+      href: "/shop",
       active: true,
       sort: 0,
     },
@@ -644,17 +529,16 @@ async function main() {
       { key: "originState", value: "KA" },
       { key: "freeShippingPaise", value: "800000" },
       { key: "enableCod", value: "true" },
-      { key: "enableInternational", value: "false" },
     ],
   });
 
-  console.log("Seeded Huduku atelier. Admin admin@huduku.in / huduku-admin");
+  console.log("Seeded Yaju. customer@yaju.in / yaju123 · admin@yaju.in / yaju-admin · hospital@yaju.in / yaju-hospital");
 }
 
 main()
   .then(() => prisma.$disconnect())
-  .catch(async (e) => {
-    console.error(e);
+  .catch(async (error) => {
+    console.error(error);
     await prisma.$disconnect();
     process.exit(1);
   });

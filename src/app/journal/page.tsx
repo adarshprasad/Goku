@@ -7,7 +7,7 @@ export default async function JournalIndex() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <h1 className="font-serif text-4xl">Journal</h1>
-      <p className="mt-2 text-[var(--muted)]">Drape notes, weave literacy, and atelier finishing.</p>
+      <p className="mt-2 text-[var(--muted)]">Wash notes and what to pack for the hospital.</p>
       <div className="mt-10 space-y-10">
         {posts.map((p) => (
           <Link key={p.id} href={`/journal/${p.slug}`} className="grid gap-4 md:grid-cols-3">
