@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getBrand } from "@/lib/brand";
 import { formatWhatsAppDisplay, waLink } from "@/lib/utils";
+import { socialLinks } from "@/lib/social";
 import { auth } from "@/auth";
 import { getCart } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
@@ -89,6 +90,7 @@ export async function SiteHeader() {
 
 export async function SiteFooter() {
   const brand = await getBrand();
+  const socials = socialLinks(brand);
   return (
     <footer className="mt-24 bg-[var(--forest)] pb-24 text-[var(--ivory)] md:pb-8">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-4">
@@ -102,13 +104,6 @@ export async function SiteFooter() {
           <p className="mt-3 text-sm leading-relaxed text-[var(--ivory)]/80">{brand.address}</p>
           <p className="mt-2 text-sm">{brand.supportEmail}</p>
           <p className="text-sm">{brand.supportPhone}</p>
-          {brand.instagram ? (
-            <p className="mt-2 text-sm">
-              <a href={brand.instagram} target="_blank" rel="noreferrer" className="underline underline-offset-4">
-                Instagram
-              </a>
-            </p>
-          ) : null}
         </div>
         <div className="flex flex-col gap-2 text-sm text-[var(--ivory)]/85">
           <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--ivory)]/55">Client care</p>
@@ -119,8 +114,18 @@ export async function SiteFooter() {
           <Link href="/legal/refund">Refunds</Link>
         </div>
         <div className="text-sm text-[var(--ivory)]/80">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--ivory)]/55">Promise</p>
-          <p className="mt-3">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--ivory)]/55">Follow</p>
+          <ul className="mt-3 space-y-2">
+            {socials.length === 0 ? <li className="text-[var(--ivory)]/60">Add social URLs in Admin → Brand & pages.</li> : null}
+            {socials.map((s) => (
+              <li key={s.href}>
+                <a href={s.href} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                  {s.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4">
             {brand.footerPromise} {brand.shippingIndia}.
           </p>
           <p className="mt-2">GSTIN {brand.gstin}</p>

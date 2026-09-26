@@ -6,6 +6,7 @@ import { formatInr, discountPercent, waLink } from "@/lib/utils";
 import { PincodeCheck } from "@/components/pincode-check";
 import { ProductCard } from "@/components/product-card";
 import { getBrand } from "@/lib/brand";
+import { absoluteAsset, productShareLinks } from "@/lib/social";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -14,9 +15,27 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const p = await prisma.product.findUnique({ where: { slug } });
+  const p = await prisma.product.findUnique({
+    where: { slug },
+    include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
+  });
   if (!p) return {};
-  return { title: p.name, description: p.description };
+  const brand = await getBrand();
+  const img = p.images[0]?.url ? absoluteAsset(brand.siteUrl, p.images[0].url) : absoluteAsset(brand.siteUrl, brand.logo);
+  const url = `${brand.siteUrl}/product/${p.slug}`;
+  return {
+    title: p.name,
+    description: p.description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: p.name,
+      description: p.description,
+      url,
+      type: "website",
+      images: [{ url: img, alt: p.name }],
+    },
+    twitter: { card: "summary_large_image", title: p.name, description: p.description, images: [img] },
+  };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -131,6 +150,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           >
             Need help draping?
           </a>
+          <p className="mt-6 text-[11px] uppercase tracking-[0.18em] text-[var(--muted)]">Share this drape</p>
+          <div className="mt-2 flex flex-wrap gap-3 text-sm">
+            {productShareLinks({
+              name: product.name,
+              url: `${brand.siteUrl}/product/${product.slug}`,
+              shopWhatsApp: brand.whatsapp,
+            }).map((s) => (
+              <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                {s.label}
+              </a>
+            ))}
+          </div>
           <PincodeCheck subtotalPaise={product.pricePaise} />
 
           <details className="mt-8 border-t border-[var(--line)] pt-4" open>

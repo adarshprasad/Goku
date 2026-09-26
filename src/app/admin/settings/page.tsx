@@ -69,10 +69,26 @@ export default async function AdminSettingsPage() {
           </div>
           <Field name="address" label="Address (footer + about + invoices)" defaultValue={brand.address} textarea />
           <div className="grid gap-6 md:grid-cols-2">
-            <Field name="instagram" label="Instagram URL (https://instagram.com/yourname)" defaultValue={brand.instagram} />
             <Field name="headerCity" label="City under the logo in the header" defaultValue={brand.headerCity} />
+            <Field name="originState" label="Origin state code for GST (e.g. KA)" defaultValue={brand.originState} />
           </div>
-          <Field name="originState" label="Origin state code for GST (e.g. KA)" defaultValue={brand.originState} />
+        </section>
+
+        <section className="space-y-6">
+          <h2 className="font-serif text-2xl">Social (paste after you create each page)</h2>
+          <p className="text-sm text-[var(--muted)]">
+            Empty fields stay hidden. Use the same username everywhere: tavaruseere. Google Business is the Maps listing, not a social app.
+          </p>
+          <div className="grid gap-6 md:grid-cols-2">
+            <Field name="instagram" label="Instagram URL" defaultValue={brand.instagram} />
+            <Field name="facebook" label="Facebook page URL" defaultValue={brand.facebook} />
+            <Field name="youtube" label="YouTube channel URL" defaultValue={brand.youtube} />
+            <Field name="pinterest" label="Pinterest URL" defaultValue={brand.pinterest} />
+            <Field name="twitter" label="X (Twitter) URL" defaultValue={brand.twitter} />
+            <Field name="linkedin" label="LinkedIn URL" defaultValue={brand.linkedin} />
+            <Field name="whatsappChannel" label="WhatsApp Channel URL" defaultValue={brand.whatsappChannel} />
+            <Field name="googleBusiness" label="Google Business / Maps URL" defaultValue={brand.googleBusiness} />
+          </div>
         </section>
 
         <section className="space-y-6">
