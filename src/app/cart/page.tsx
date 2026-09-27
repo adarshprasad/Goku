@@ -63,8 +63,8 @@ export default async function CartPage() {
           ))}
           <div className="flex items-center justify-between">
             <p className="text-lg">Subtotal {formatInr(subtotal)}</p>
-            <Link href="/checkout" className="inline-flex min-h-12 items-center bg-[var(--maroon)] px-6 text-[var(--ivory)]">
-              Checkout
+            <Link href="/checkout" className="inline-flex min-h-12 items-center bg-[var(--forest)] px-6 text-[var(--ivory)]">
+              Order on WhatsApp
             </Link>
           </div>
         </div>

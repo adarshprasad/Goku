@@ -24,8 +24,9 @@ export default async function AccountPage() {
           <h2 className="font-serif text-2xl">Returns</h2>
         </Link>
         {session.user.role === "ADMIN" || session.user.role === "STAFF" ? (
-          <Link href="/admin" className="border border-[var(--line)] p-5">
-            <h2 className="font-serif text-2xl">Admin</h2>
+          <Link href="/admin" className="border border-[var(--forest)] bg-[var(--forest)] p-5 text-[var(--ivory)]">
+            <h2 className="font-serif text-2xl">Admin desk</h2>
+            <p className="mt-1 text-sm text-[var(--ivory)]/80">Catalog, photos, WhatsApp, orders</p>
           </Link>
         ) : null}
       </div>

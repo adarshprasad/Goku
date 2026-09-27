@@ -1,20 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getBrand } from "@/lib/brand";
+import { formatWhatsAppDisplay, waLink } from "@/lib/utils";
+import { socialLinks } from "@/lib/social";
 import { auth } from "@/auth";
 import { getCart } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
 
-const nav = [
-  { href: "/shop", label: "Shop" },
-  { href: "/collections/wedding", label: "Wedding" },
-  { href: "/collections/handloom", label: "Handloom" },
-  { href: "/journal", label: "Journal" },
-  { href: "/about", label: "Atelier" },
-];
-
 export async function SiteHeader() {
   const [session, brand] = await Promise.all([auth(), getBrand()]);
+  const nav = [
+    { href: "/shop", label: brand.navShop },
+    { href: brand.navWeddingHref, label: brand.navWedding },
+    { href: brand.navHandloomHref, label: brand.navHandloom },
+    { href: "/journal", label: brand.navJournal },
+    { href: "/about", label: brand.navAbout },
+  ];
   let count = 0;
   try {
     const cart = await getCart();
@@ -43,7 +44,7 @@ export async function SiteHeader() {
           <span>
             <span className="block font-serif text-2xl tracking-tight text-[var(--ivory)]">{brand.name}</span>
             <span className="mt-0.5 hidden text-[10px] tracking-[0.14em] text-[var(--ivory)]/70 sm:block">
-              Bengaluru
+              {brand.headerCity}
             </span>
           </span>
         </Link>
@@ -56,16 +57,25 @@ export async function SiteHeader() {
         </nav>
         <div className="flex items-center gap-3 text-sm">
           {staff ? (
-            <Link href="/admin" className="hidden min-h-11 items-center md:inline-flex">
-              Desk
+            <Link
+              href="/admin"
+              className="inline-flex min-h-11 items-center border border-[var(--ivory)]/50 px-3 text-[var(--ivory)]"
+            >
+              Admin
             </Link>
           ) : null}
           <Link href="/wishlist" className="min-h-11 min-w-11 inline-flex items-center text-[var(--ivory)]/85">
             Wish{wish ? ` (${wish})` : ""}
           </Link>
-          <Link href={session ? "/account" : "/login"} className="min-h-11 inline-flex items-center text-[var(--ivory)]/85">
-            {session ? "Account" : "Sign in"}
-          </Link>
+          {session ? (
+            <Link href="/account" className="min-h-11 inline-flex items-center text-[var(--ivory)]/85">
+              Account
+            </Link>
+          ) : (
+            <a href="/login" className="min-h-11 inline-flex items-center text-[var(--ivory)]/85">
+              Sign in
+            </a>
+          )}
           <Link
             href="/cart"
             className="inline-flex min-h-11 min-w-11 items-center justify-center border border-[var(--ivory)] px-4 text-[var(--ivory)]"
@@ -80,6 +90,7 @@ export async function SiteHeader() {
 
 export async function SiteFooter() {
   const brand = await getBrand();
+  const socials = socialLinks(brand);
   return (
     <footer className="mt-24 bg-[var(--forest)] pb-24 text-[var(--ivory)] md:pb-8">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-4">
@@ -103,8 +114,20 @@ export async function SiteFooter() {
           <Link href="/legal/refund">Refunds</Link>
         </div>
         <div className="text-sm text-[var(--ivory)]/80">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--ivory)]/55">Promise</p>
-          <p className="mt-3">Prepaid UPI & cards. GST invoice. {brand.shippingIndia}.</p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--ivory)]/55">Follow</p>
+          <ul className="mt-3 space-y-2">
+            {socials.length === 0 ? <li className="text-[var(--ivory)]/60">Add social URLs in Admin → Brand & pages.</li> : null}
+            {socials.map((s) => (
+              <li key={s.href}>
+                <a href={s.href} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                  {s.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4">
+            {brand.footerPromise} {brand.shippingIndia}.
+          </p>
           <p className="mt-2">GSTIN {brand.gstin}</p>
         </div>
       </div>
@@ -112,12 +135,14 @@ export async function SiteFooter() {
   );
 }
 
-export function BottomNav() {
+export async function BottomNav() {
+  const session = await auth();
+  const staff = session?.user?.role === "ADMIN" || session?.user?.role === "STAFF";
   const items = [
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
-    { href: "/wishlist", label: "Wish" },
-    { href: "/account", label: "Account" },
+    ...(staff ? [{ href: "/admin", label: "Admin" }] : [{ href: "/wishlist", label: "Wish" }]),
+    { href: session ? "/account" : "/login", label: session ? "Account" : "Sign in" },
   ];
   return (
     <nav
@@ -125,9 +150,9 @@ export function BottomNav() {
       aria-label="Mobile"
     >
       {items.map((i) => (
-        <Link key={i.href} href={i.href} className="flex min-h-14 flex-1 items-center justify-center text-sm">
+        <a key={i.href} href={i.href} className="flex min-h-14 flex-1 items-center justify-center text-sm">
           {i.label}
-        </Link>
+        </a>
       ))}
     </nav>
   );
@@ -135,7 +160,7 @@ export function BottomNav() {
 
 export async function WhatsAppButton() {
   const brand = await getBrand();
-  const href = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent(`Namaskara, I would like help choosing a ${brand.name} drape.`)}`;
+  const href = waLink(`Namaskara, I would like help choosing a ${brand.name} drape.`, brand.whatsapp);
   return (
     <a
       href={href}
@@ -143,7 +168,7 @@ export async function WhatsAppButton() {
       rel="noreferrer"
       className="fixed bottom-20 right-4 z-40 inline-flex min-h-12 items-center border border-[var(--forest)] bg-[var(--ivory)] px-4 text-sm text-[var(--forest)] md:bottom-6"
     >
-      WhatsApp
+      WhatsApp {formatWhatsAppDisplay(brand.whatsapp)}
     </a>
   );
 }

@@ -1,10 +1,10 @@
 # Tavaru
 
-Premium saree atelier storefront — Next.js, Prisma (SQLite locally / Postgres in production), Razorpay (or labeled mock gateway), admin desk, PWA.
+Premium saree atelier — Next.js, PostgreSQL, WhatsApp orders, admin desk.
 
-**For the days that become photographs.**
+**For the days that become photographs.** Orders are confirmed and paid **on WhatsApp**. Nothing is charged on the website.
 
-Forest green `#284232` · champagne gold `#D1C792`. Logo: `public/brand/tavaru-logo.png`.
+Forest green `#284232` · ivory. Logo: `public/brand/tavaru-logo.png`. Live: **https://tavaruseere.com**.
 
 ## Phone app in ~5 minutes
 
@@ -26,6 +26,7 @@ Install **Expo Go** on Android/iPhone, scan the QR. Details: [apps/mobile/README
 ```bash
 cp .env.example .env
 # AUTH_SECRET must be a long random string
+docker compose up -d
 npm install
 npx prisma db push
 npm run db:seed
@@ -44,7 +45,7 @@ Open [http://localhost:3000](http://localhost:3000).
 git clone <your-gitlab-repo-url>
 cd <repo>
 cp .env.example .env
-# put a long random string in AUTH_SECRET and NEXTAUTH_SECRET
+docker compose up -d
 npm install
 npx prisma db push
 npm run db:seed
@@ -56,7 +57,7 @@ Then visit `http://localhost:3000`. Admin: `admin@huduku.in` / `huduku-admin`.
 ### Put it on the internet (recommended)
 
 1. Create a **Postgres** database (Neon, Supabase, or Render Postgres). Copy the connection string.
-2. In `prisma/schema.prisma` change `provider = "sqlite"` to `provider = "postgresql"`.
+2. Postgres is already the Prisma provider. Use Docker (`docker compose up -d`) or a hosted Postgres URL in `DATABASE_URL`.
 3. Create an app on **[Render](https://render.com)**, **[Railway](https://railway.app)**, **[Fly.io](https://fly.io)**, or **Vercel**, and **connect the GitLab repo** (they pull from GitLab; you do not need GitHub).
 4. Set environment variables from `.env.example`, using your public URL:
 
@@ -73,7 +74,7 @@ NEXT_PUBLIC_SITE_URL=https://tavaruseere.com
    Start command: `npm start`  
    (Seed only the first time, or you will wipe orders.)
 
-6. Optional: add Razorpay keys and set the webhook URL to `https://tavaruseere.com/api/webhooks/razorpay`.
+Orders open WhatsApp with the bag already typed. Pay by UPI in chat.
 
 GitLab CI (`.gitlab-ci.yml`) will **test and build** on every push. Use a host above to **run** the site. A `Dockerfile` is included if you prefer a container (Fly, Cloud Run, a VPS).
 
@@ -86,22 +87,64 @@ Coupons: `HUDUKU10`, `FIRSTDRAPE`, `FREESHIP`.
 
 ## Payments
 
-Leave `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` empty to use the **mock gateway**. It still creates the order, verifies on the server, decrements stock, and writes a GST invoice number.
-
-When keys are present, checkout opens Razorpay (UPI, cards, netbanking, wallets, EMI). Confirm payment only via `/api/webhooks/razorpay` (signature).
-
-COD: India, eligible pincodes, ₹49 fee, max ₹25,000. Blocked demo pincodes: 110001, 400001, 999999.
-
-Stripe is gated behind `ENABLE_INTERNATIONAL=true`.
+There is **no Razorpay / card checkout**. Place order → WhatsApp chat with order number, items, address, and total. You confirm and collect UPI on WhatsApp. Mark **PAID** in Admin → Orders.
 
 ## Stack
 
 - Next.js 15 App Router, TypeScript, Tailwind
-- Auth.js credentials (Google optional)
-- Prisma + SQLite (`DATABASE_URL=file:./dev.db`). For production set a Postgres URL and change `provider` in `prisma/schema.prisma`
-- Admin at `/admin` (ADMIN / STAFF)
+- Auth.js credentials
+- Prisma + **PostgreSQL** (`docker compose up -d` or any Postgres URL)
+- Admin at `/admin`
 - PWA: `public/manifest.webmanifest`
-- Expo notes: `apps/mobile/README.md`
+
+## Fedora (shop + Postgres + tunnel)
+
+You do **not** need Docker. Install Postgres with dnf:
+
+```bash
+cd ~/huduku
+git fetch origin
+git checkout cursor/whatsapp-postgres-939e
+git pull
+sudo bash scripts/fedora-postgres.sh
+```
+
+That installs PostgreSQL, starts it, and creates database `tavaru` / user `tavaru`. Then:
+
+```bash
+# If .env does not exist yet:
+cp -n .env.example .env
+# Use 127.0.0.1 (not localhost) so Postgres uses a password, not Unix ident:
+# DATABASE_URL=postgresql://tavaru:tavaru@127.0.0.1:5432/tavaru
+nano .env
+openssl rand -base64 32   # paste into AUTH_SECRET and NEXTAUTH_SECRET
+npx prisma db push
+npm run db:seed           # first time only — wipes orders
+npm run build
+nohup npm start > nohup.out 2>&1 &
+nohup cloudflared tunnel run tavaru > ~/cloudflared.log 2>&1 &
+```
+
+If Sign in shows “Application error”, the old Next process is still serving mixed files. Stop it, rebuild, start:
+
+```bash
+cd ~/huduku
+sudo bash scripts/fedora-postgres.sh   # only if Postgres is not already running
+bash scripts/fedora-restart-shop.sh
+```
+
+Hard-refresh the browser (Ctrl+Shift+R). Cloudflare is **not** inside `ps` unless you start the tunnel:
+
+```bash
+nohup cloudflared tunnel run tavaru > ~/cloudflared.log 2>&1 &
+tail -f ~/cloudflared.log
+```
+
+The shop on this PC is `http://127.0.0.1:3000`. The public name `https://tavaruseere.com` only works while **both** `next-server` and `cloudflared` are running.
+
+If you already have SQLite `dev.db` with catalog you care about, export products from admin after seed, or keep a copy of the old file — `db:seed` on Postgres is a fresh shop.
+
+Change the admin password immediately: `/admin` → Brand & pages.
 
 ## Tests
 
@@ -133,20 +176,19 @@ NEXT_PUBLIC_SUPPORT_EMAIL=hello@tavaruseere.com
 ```
 
 2. Admin → **Brand & pages** → Public website → `https://tavaruseere.com`
-3. Razorpay webhook: `https://tavaruseere.com/api/webhooks/razorpay`
 
-Then `npm run build` and restart `npm start`. Login/cookies will not work on the domain until AUTH_URL matches.
-
-The zone currently has an A record to `160.153.0.142` (GoDaddy). That IP must be the host that runs this Next.js shop, or you must change the A record (or Cloudflare proxy) to whatever actually serves `npm start`. The `_acme-challenge` CNAME is already set for Cloudflare SSL.
+Then `npm run build` and restart `npm start` plus the Cloudflare tunnel. Login/cookies will not work on the domain until AUTH_URL matches.
 
 ## Admin (photos and copy)
 
 Sign in as admin, then open `/admin` (or Account → Admin).
 
-- **Brand & pages** — domain, name, tagline, logo, contact, About, legal copy, home craft photo
-- **Catalog** — add/edit drapes, upload multiple photos, price, stock, collections
-- **Collections / Home banners / Journal** — text plus image upload
-- **Coupons / Orders** — pause codes, tracking numbers
+- **Brand & pages** — name, domain, WhatsApp, logo, menu, home copy, about, legal, **admin email & password**
+- **Catalog** — drapes, photos, price, stock (open from the desk cards)
+- **Collections / Home banners / Journal / Finishing** — copy and images
+- **Coupons / Orders** — codes, tracking, mark PAID, open WhatsApp for that order
+
+The admin header stays on every desk page. On a phone, **Admin** is in the top bar and the bottom bar after you sign in.
 
 Uploads land in `public/uploads` (and logos in `public/brand`) on the machine that runs `npm start`.
 

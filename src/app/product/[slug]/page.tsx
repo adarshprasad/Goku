@@ -6,6 +6,7 @@ import { formatInr, discountPercent, waLink } from "@/lib/utils";
 import { PincodeCheck } from "@/components/pincode-check";
 import { ProductCard } from "@/components/product-card";
 import { getBrand } from "@/lib/brand";
+import { absoluteAsset, productShareLinks } from "@/lib/social";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -14,9 +15,27 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const p = await prisma.product.findUnique({ where: { slug } });
+  const p = await prisma.product.findUnique({
+    where: { slug },
+    include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
+  });
   if (!p) return {};
-  return { title: p.name, description: p.description };
+  const brand = await getBrand();
+  const img = p.images[0]?.url ? absoluteAsset(brand.siteUrl, p.images[0].url) : absoluteAsset(brand.siteUrl, brand.logo);
+  const url = `${brand.siteUrl}/product/${p.slug}`;
+  return {
+    title: p.name,
+    description: p.description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: p.name,
+      description: p.description,
+      url,
+      type: "website",
+      images: [{ url: img, alt: p.name }],
+    },
+    twitter: { card: "summary_large_image", title: p.name, description: p.description, images: [img] },
+  };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -68,7 +87,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {formatInr(product.pricePaise)}
             {off > 0 ? <span className="ml-2 text-base text-[var(--muted)] line-through">{formatInr(product.mrpPaise)}</span> : null}
           </p>
-          <p className="mt-1 text-sm text-[var(--muted)]">EMI available on Razorpay for eligible cards.</p>
+          <p className="mt-1 text-sm text-[var(--muted)]">{brand.productPayNote}</p>
           <p className="mt-3 text-sm">
             {stock > 0 ? `${stock} in atelier` : "Made to order"}
             {stock > 0 && stock <= 3 ? " · low stock" : ""}
@@ -109,9 +128,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               <input name="note" placeholder="Blouse measurements, gift wrap name…" className="mt-1 min-h-11 w-full border border-[var(--line)] bg-white px-3" />
             </label>
             <div className="flex flex-wrap gap-3">
-              <button className="min-h-12 flex-1 bg-[var(--maroon)] px-6 text-[var(--ivory)]" disabled={stock < 1 && !product.madeToOrder}>
+              <button className="min-h-12 flex-1 bg-[var(--forest)] px-6 text-[var(--ivory)]" disabled={stock < 1 && !product.madeToOrder}>
                 Add to bag
               </button>
+              <a
+                href={waLink(
+                  `Namaskara, I would like this ${brand.name} drape:\n\n${product.name}\n${formatInr(product.pricePaise)}\n${brand.siteUrl}/product/${product.slug}\n\nPlease help me confirm and pay on WhatsApp.`,
+                  brand.whatsapp,
+                )}
+                className="inline-flex min-h-12 flex-1 items-center justify-center border border-[var(--forest)] px-6 text-[var(--forest)]"
+              >
+                Order on WhatsApp
+              </a>
               <WishButton productId={product.id} />
             </div>
           </form>
@@ -122,6 +150,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           >
             Need help draping?
           </a>
+          <p className="mt-6 text-[11px] uppercase tracking-[0.18em] text-[var(--muted)]">Share this drape</p>
+          <div className="mt-2 flex flex-wrap gap-3 text-sm">
+            {productShareLinks({
+              name: product.name,
+              url: `${brand.siteUrl}/product/${product.slug}`,
+              shopWhatsApp: brand.whatsapp,
+            }).map((s) => (
+              <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                {s.label}
+              </a>
+            ))}
+          </div>
           <PincodeCheck subtotalPaise={product.pricePaise} />
 
           <details className="mt-8 border-t border-[var(--line)] pt-4" open>

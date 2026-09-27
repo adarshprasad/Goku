@@ -55,3 +55,25 @@ export async function saveSiteSettings(formData: FormData) {
   revalidatePath("/", "layout");
   revalidatePath("/admin/settings");
 }
+
+export async function changeAdminPassword(formData: FormData) {
+  const session = await requireStaff();
+  const userId = session?.user?.id;
+  if (!userId) throw new Error("You need an atelier login for this.");
+  const email = String(formData.get("email") || "")
+    .trim()
+    .toLowerCase();
+  if (!email.includes("@")) throw new Error("Enter a valid admin email.");
+  const next = String(formData.get("newPassword") || "");
+  const data: { email: string; passwordHash?: string } = { email };
+  if (next) {
+    if (next.length < 8) throw new Error("Password must be at least 8 characters.");
+    const bcrypt = (await import("bcryptjs")).default;
+    data.passwordHash = await bcrypt.hash(next, 10);
+  }
+  await prisma.user.update({
+    where: { id: userId },
+    data,
+  });
+  revalidatePath("/admin/settings");
+}
