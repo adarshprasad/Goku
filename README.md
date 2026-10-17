@@ -184,7 +184,7 @@ Then `npm run build` and restart `npm start` plus the Cloudflare tunnel. Login/c
 Sign in as admin, then open `/admin` (or Account → Admin).
 
 - **Brand & pages** — name, domain, WhatsApp, logo, menu, home copy, about, legal, **admin email & password**
-- **Catalog** — drapes, photos, price, stock (open from the desk cards)
+- **Catalog** — drapes, photos, price, **colour swatches and stock per colour**
 - **Collections / Home banners / Journal / Finishing** — copy and images
 - **Coupons / Orders** — codes, tracking, mark PAID, open WhatsApp for that order
 

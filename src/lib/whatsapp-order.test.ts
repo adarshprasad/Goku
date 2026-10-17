@@ -23,8 +23,10 @@ describe("whatsapp order text", () => {
       name: "Kanjivaram",
       pricePaise: 12_000_00,
       url: "https://tavaruseere.com/product/x",
+      color: "Ruby",
     });
     expect(t).toMatch(/Kanjivaram/);
+    expect(t).toMatch(/Colour: Ruby/);
     expect(t).toMatch(/WhatsApp/);
   });
 });

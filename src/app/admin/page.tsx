@@ -6,7 +6,7 @@ import { getBrand } from "@/lib/brand";
 
 const desks = [
   { href: "/admin/settings", title: "Brand & pages", body: "Name, logo, WhatsApp, address, home copy, about, legal, admin login." },
-  { href: "/admin/products", title: "Catalog", body: "Sarees, photos, price, stock, weave, GI tag." },
+  { href: "/admin/products", title: "Catalog", body: "Sarees, photos, price, colour variants, stock per colour." },
   { href: "/admin/collections", title: "Collections", body: "Wedding, handloom, and shop-by-weave photos." },
   { href: "/admin/banners", title: "Home banners", body: "Hero photograph and overlay line." },
   { href: "/admin/journal", title: "Journal", body: "Stories on the home page and /journal." },

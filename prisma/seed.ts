@@ -534,6 +534,7 @@ async function main() {
                     name: p.color,
                     sku: `${p.sku}-DEF`,
                     color: p.color,
+                    hex: null,
                     stock: p.stock,
                   },
                 ],

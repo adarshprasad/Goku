@@ -1,4 +1,5 @@
 import { saveProduct, deleteProductImage } from "./actions";
+import { ColorVariantEditor, type ColorRow } from "@/components/color-variant-editor";
 
 type CollectionOpt = { id: string; name: string };
 
@@ -30,10 +31,9 @@ export type ProductEditorValue = {
   featured: boolean;
   published: boolean;
   madeToOrder: boolean;
-  stock: number;
-  variantId: string;
+  variants: ColorRow[];
   collectionIds: string[];
-  images: { id: string; url: string; alt: string }[];
+  images: { id: string; url: string; alt: string; variantId?: string | null }[];
 };
 
 const empty: ProductEditorValue = {
@@ -63,8 +63,7 @@ const empty: ProductEditorValue = {
   featured: false,
   published: true,
   madeToOrder: false,
-  stock: 1,
-  variantId: "",
+  variants: [{ id: "", color: "", hex: "#284232", sku: "", stock: 1 }],
   collectionIds: [],
   images: [],
 };
@@ -105,21 +104,18 @@ export function ProductEditor({
   return (
     <form action={saveProduct} className="mt-8 space-y-5">
       {p.id ? <input type="hidden" name="id" value={p.id} /> : null}
-      <input type="hidden" name="variantId" value={p.variantId} />
       <div className="grid gap-5 md:grid-cols-2">
         <Inp name="name" label="Name" defaultValue={p.name} />
-        <Inp name="sku" label="SKU" defaultValue={p.sku} />
+        <Inp name="sku" label="Base SKU" defaultValue={p.sku} />
         <Inp name="slug" label="URL slug (blank = from name)" defaultValue={p.slug} />
         <Inp name="type" label="Type" defaultValue={p.type} />
         <Inp name="price" label="Price ₹" type="number" defaultValue={Math.round(p.pricePaise / 100) || ""} />
         <Inp name="mrp" label="MRP ₹" type="number" defaultValue={Math.round(p.mrpPaise / 100) || ""} />
-        <Inp name="stock" label="Stock" type="number" defaultValue={p.stock} />
         <Inp name="hsn" label="HSN" defaultValue={p.hsn} />
         <Inp name="weave" label="Weave" defaultValue={p.weave} />
         <Inp name="fabric" label="Fabric" defaultValue={p.fabric} />
         <Inp name="work" label="Work" defaultValue={p.work} />
         <Inp name="occasion" label="Occasion" defaultValue={p.occasion} />
-        <Inp name="color" label="Colour" defaultValue={p.color} />
         <Inp name="weightFeel" label="Weight" defaultValue={p.weightFeel} />
         <Inp name="lengthMeters" label="Length (m)" type="number" defaultValue={p.lengthMeters} />
         <Inp name="care" label="Care" defaultValue={p.care} />
@@ -133,6 +129,7 @@ export function ProductEditor({
         <Inp name="border" label="Border" defaultValue={p.border} />
         <Inp name="pallu" label="Pallu" defaultValue={p.pallu} />
       </div>
+      <ColorVariantEditor variants={p.variants} />
       <fieldset>
         <legend className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">Collections</legend>
         <div className="mt-3 flex flex-wrap gap-3">
@@ -164,6 +161,21 @@ export function ProductEditor({
             <div key={img.id} className="border border-[var(--line)] p-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={img.url} alt={img.alt} className="aspect-[3/4] w-full object-cover" />
+              <label className="mt-2 block text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+                Shown for
+                <select
+                  name={`imageVariant_${img.id}`}
+                  defaultValue={img.variantId ?? ""}
+                  className="mt-1 min-h-9 w-full border border-[var(--line)] bg-[var(--ivory)] px-1 text-sm normal-case tracking-normal"
+                >
+                  <option value="">All colours</option>
+                  {p.variants.filter((v) => v.id).map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.color || "Colour"}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <form action={deleteProductImage} className="mt-2">
                 <input type="hidden" name="imageId" value={img.id} />
                 <input type="hidden" name="productId" value={p.id} />
@@ -174,7 +186,7 @@ export function ProductEditor({
         </div>
       ) : null}
       <label className="block text-sm">
-        <span className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">Add photographs</span>
+        <span className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">Shared photographs (all colours)</span>
         <input name="photos" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple className="mt-2 block w-full text-sm" />
       </label>
       <button className="min-h-12 bg-[var(--forest)] px-8 text-[var(--ivory)]">Save drape</button>

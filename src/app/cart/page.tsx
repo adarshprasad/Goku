@@ -1,5 +1,6 @@
 import { getCart, cartTotals, parseAddons } from "@/lib/cart";
 import { formatInr } from "@/lib/utils";
+import { imagesForVariant } from "@/lib/colors";
 import { updateCartItem } from "@/app/actions/cart";
 import Link from "next/link";
 import Image from "next/image";
@@ -31,15 +32,19 @@ export default async function CartPage() {
           {lines.map(({ item, line }) => (
             <div key={item.id} className="flex gap-4 border-b border-[var(--line)] pb-6">
               <div className="relative h-36 w-28 shrink-0 bg-[var(--ivory-2)]">
-                {item.product.images[0] ? (
-                  <Image src={item.product.images[0].url} alt="" fill className="object-cover" />
-                ) : null}
+                {(() => {
+                  const thumb = imagesForVariant(item.product.images, item.variantId)[0];
+                  return thumb ? <Image src={thumb.url} alt="" fill className="object-cover" /> : null;
+                })()}
               </div>
               <div className="flex-1">
                 <Link href={`/product/${item.product.slug}`} className="font-serif text-xl">
                   {item.product.name}
                 </Link>
-                <p className="text-sm text-[var(--muted)]">{item.variant?.name}</p>
+                <p className="text-sm text-[var(--muted)]">
+                  {item.variant?.color || item.variant?.name}
+                  {item.variant && item.variant.stock < 1 ? " · out of stock" : ""}
+                </p>
                 <p className="text-sm">
                   {parseAddons(item.addons)
                     .map((s) => addonNames.get(s))

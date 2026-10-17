@@ -18,9 +18,9 @@ export async function addToCart(formData: FormData): Promise<void> {
   });
   if (!product?.published) return;
 
-  const variant =
-    product.variants.find((v) => v.id === variantId) ?? product.variants[0];
-  if (!variant || variant.stock < quantity) {
+  const variant = product.variants.find((v) => v.id === variantId);
+  if (!variant) return;
+  if (variant.stock < quantity && !product.madeToOrder) {
     return;
   }
 
@@ -69,7 +69,7 @@ export async function updateCartItem(formData: FormData): Promise<void> {
     await prisma.cartItem.delete({ where: { id } });
   } else {
     const stock = item.variant?.stock ?? 0;
-    if (quantity > stock) return;
+    if (quantity > stock && !item.product.madeToOrder) return;
     await prisma.cartItem.update({ where: { id }, data: { quantity } });
   }
   revalidatePath("/cart");
