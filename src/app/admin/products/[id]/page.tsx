@@ -60,6 +60,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
               hex: v.hex || "#284232",
               sku: v.sku,
               stock: v.stock,
+              images: product.images.filter((img) => img.variantId === v.id).map((img) => ({ id: img.id, url: img.url })),
             })),
           collectionIds: product.collections.map((c) => c.collectionId),
           images: product.images,

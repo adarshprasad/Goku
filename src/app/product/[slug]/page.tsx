@@ -1,11 +1,10 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { toggleWishlist } from "@/app/actions/cart";
 import { formatInr, discountPercent, waLink } from "@/lib/utils";
 import { PincodeCheck } from "@/components/pincode-check";
 import { ProductCard } from "@/components/product-card";
-import { ProductBuyForm } from "@/components/product-buy-form";
+import { ProductColorExperience } from "@/components/product-color-experience";
 import { getBrand } from "@/lib/brand";
 import { absoluteAsset, productShareLinks } from "@/lib/social";
 import type { Metadata } from "next";
@@ -73,104 +72,97 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className="grid gap-10 md:grid-cols-2">
-        <div className="space-y-3">
-          {product.images.map((img) => (
-            <div key={img.id} className="relative aspect-[3/4] overflow-hidden bg-[var(--ivory-2)]">
-              <Image src={img.url} alt={img.alt} fill className="object-cover" sizes="50vw" />
-            </div>
+      <ProductColorExperience
+        images={product.images.map((img) => ({
+          id: img.id,
+          url: img.url,
+          alt: img.alt,
+          variantId: img.variantId,
+        }))}
+        variants={product.variants.map((v) => ({
+          id: v.id,
+          name: v.name,
+          color: v.color,
+          hex: v.hex,
+          stock: v.stock,
+          sku: v.sku,
+        }))}
+        productId={product.id}
+        productName={product.name}
+        pricePaise={product.pricePaise}
+        productUrl={`${brand.siteUrl}/product/${product.slug}`}
+        brandName={brand.name}
+        whatsapp={brand.whatsapp}
+        madeToOrder={product.madeToOrder}
+        addons={addons.map((a) => ({ id: a.id, slug: a.slug, name: a.name, pricePaise: a.pricePaise }))}
+      >
+        <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">{product.weave}</p>
+        <h1 className="mt-2 font-serif text-4xl">{product.name}</h1>
+        <p className="mt-4 text-xl">
+          {formatInr(product.pricePaise)}
+          {off > 0 ? <span className="ml-2 text-base text-[var(--muted)] line-through">{formatInr(product.mrpPaise)}</span> : null}
+        </p>
+        <p className="mt-1 text-sm text-[var(--muted)]">{brand.productPayNote}</p>
+        <p className="mt-3 text-sm">
+          {stock > 0 ? `${stock} in atelier` : "Made to order"}
+          {stock > 0 && stock <= 3 ? " · low stock" : ""}
+        </p>
+        {product.modelHeightCm ? (
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            Model {product.modelHeightCm} cm · blouse {product.modelBlouseSize}
+          </p>
+        ) : null}
+      </ProductColorExperience>
+      <div className="mt-8 md:ml-auto md:w-1/2 md:pl-5">
+        <WishButton productId={product.id} />
+        <a
+          href={waLink(`I need help draping ${product.name}`, brand.whatsapp)}
+          className="mt-4 inline-block text-sm underline"
+        >
+          Need help draping?
+        </a>
+        <p className="mt-6 text-[11px] uppercase tracking-[0.18em] text-[var(--muted)]">Share this drape</p>
+        <div className="mt-2 flex flex-wrap gap-3 text-sm">
+          {productShareLinks({
+            name: product.name,
+            url: `${brand.siteUrl}/product/${product.slug}`,
+            shopWhatsApp: brand.whatsapp,
+          }).map((s) => (
+            <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+              {s.label}
+            </a>
           ))}
         </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">{product.weave}</p>
-          <h1 className="mt-2 font-serif text-4xl">{product.name}</h1>
-          <p className="mt-4 text-xl">
-            {formatInr(product.pricePaise)}
-            {off > 0 ? <span className="ml-2 text-base text-[var(--muted)] line-through">{formatInr(product.mrpPaise)}</span> : null}
+        <PincodeCheck subtotalPaise={product.pricePaise} />
+        <details className="mt-8 border-t border-[var(--line)] pt-4" open>
+          <summary className="cursor-pointer font-serif text-xl">The drape</summary>
+          <p className="mt-3 leading-relaxed text-[var(--muted)]">{product.description}</p>
+        </details>
+        <details className="mt-3 border-t border-[var(--line)] pt-4">
+          <summary className="cursor-pointer font-serif text-xl">Craft</summary>
+          <p className="mt-3 text-[var(--muted)]">{product.craftStory}</p>
+          {product.artisanNote ? <p className="mt-2 text-sm">{product.artisanNote}</p> : null}
+          {product.giTag ? <p className="mt-2 text-sm">GI: {product.giTag}</p> : null}
+        </details>
+        <details className="mt-3 border-t border-[var(--line)] pt-4">
+          <summary className="cursor-pointer font-serif text-xl">Details & care</summary>
+          <ul className="mt-3 space-y-1 text-sm text-[var(--muted)]">
+            <li>Fabric · {product.fabric}</li>
+            <li>Work · {product.work}</li>
+            <li>Occasion · {product.occasion}</li>
+            <li>Length · {product.lengthMeters} m {product.blousePiece ? `· blouse piece ${product.blouseLengthM} m` : ""}</li>
+            <li>Weight · {product.weightFeel}</li>
+            <li>Pallu · {product.pallu}</li>
+            <li>Care · {product.care}</li>
+            <li>HSN · {product.hsn}</li>
+          </ul>
+        </details>
+        <details className="mt-3 border-t border-[var(--line)] pt-4">
+          <summary className="cursor-pointer font-serif text-xl">Shipping & stitching</summary>
+          <p className="mt-3 text-sm text-[var(--muted)]">
+            {brand.shippingIndia}. Fall & pico and blouse stitching add 4–7 days. Stitched / custom pieces cannot be returned.
           </p>
-          <p className="mt-1 text-sm text-[var(--muted)]">{brand.productPayNote}</p>
-          <p className="mt-3 text-sm">
-            {stock > 0 ? `${stock} in atelier` : "Made to order"}
-            {stock > 0 && stock <= 3 ? " · low stock" : ""}
-          </p>
-          {product.modelHeightCm ? (
-            <p className="mt-1 text-sm text-[var(--muted)]">
-              Model {product.modelHeightCm} cm · blouse {product.modelBlouseSize}
-            </p>
-          ) : null}
-
-          <ProductBuyForm
-            productId={product.id}
-            productName={product.name}
-            pricePaise={product.pricePaise}
-            productUrl={`${brand.siteUrl}/product/${product.slug}`}
-            brandName={brand.name}
-            whatsapp={brand.whatsapp}
-            madeToOrder={product.madeToOrder}
-            variants={product.variants.map((v) => ({
-              id: v.id,
-              name: v.name,
-              color: v.color,
-              hex: v.hex,
-              stock: v.stock,
-              sku: v.sku,
-            }))}
-            addons={addons.map((a) => ({ id: a.id, slug: a.slug, name: a.name, pricePaise: a.pricePaise }))}
-          />
-          <div className="mt-3">
-            <WishButton productId={product.id} />
-          </div>
-
-          <a
-            href={waLink(`I need help draping ${product.name}`, brand.whatsapp)}
-            className="mt-4 inline-block text-sm underline"
-          >
-            Need help draping?
-          </a>
-          <p className="mt-6 text-[11px] uppercase tracking-[0.18em] text-[var(--muted)]">Share this drape</p>
-          <div className="mt-2 flex flex-wrap gap-3 text-sm">
-            {productShareLinks({
-              name: product.name,
-              url: `${brand.siteUrl}/product/${product.slug}`,
-              shopWhatsApp: brand.whatsapp,
-            }).map((s) => (
-              <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="underline underline-offset-4">
-                {s.label}
-              </a>
-            ))}
-          </div>
-          <PincodeCheck subtotalPaise={product.pricePaise} />
-
-          <details className="mt-8 border-t border-[var(--line)] pt-4" open>
-            <summary className="cursor-pointer font-serif text-xl">The drape</summary>
-            <p className="mt-3 leading-relaxed text-[var(--muted)]">{product.description}</p>
-          </details>
-          <details className="mt-3 border-t border-[var(--line)] pt-4">
-            <summary className="cursor-pointer font-serif text-xl">Craft</summary>
-            <p className="mt-3 text-[var(--muted)]">{product.craftStory}</p>
-            {product.artisanNote ? <p className="mt-2 text-sm">{product.artisanNote}</p> : null}
-            {product.giTag ? <p className="mt-2 text-sm">GI: {product.giTag}</p> : null}
-          </details>
-          <details className="mt-3 border-t border-[var(--line)] pt-4">
-            <summary className="cursor-pointer font-serif text-xl">Details & care</summary>
-            <ul className="mt-3 space-y-1 text-sm text-[var(--muted)]">
-              <li>Fabric · {product.fabric}</li>
-              <li>Work · {product.work}</li>
-              <li>Occasion · {product.occasion}</li>
-              <li>Length · {product.lengthMeters} m {product.blousePiece ? `· blouse piece ${product.blouseLengthM} m` : ""}</li>
-              <li>Weight · {product.weightFeel}</li>
-              <li>Pallu · {product.pallu}</li>
-              <li>Care · {product.care}</li>
-              <li>HSN · {product.hsn}</li>
-            </ul>
-          </details>
-          <details className="mt-3 border-t border-[var(--line)] pt-4">
-            <summary className="cursor-pointer font-serif text-xl">Shipping & stitching</summary>
-            <p className="mt-3 text-sm text-[var(--muted)]">
-              {brand.shippingIndia}. Fall & pico and blouse stitching add 4–7 days. Stitched / custom pieces cannot be returned.
-            </p>
-          </details>
-        </div>
+        </details>
       </div>
 
       {product.pairWith.length > 0 ? (

@@ -64,6 +64,16 @@ export function variantLabel(v: { name?: string | null; color?: string | null })
   return (v.color || v.name || "Colour").trim();
 }
 
+export function imagesForVariant<T extends { variantId?: string | null }>(images: T[], variantId?: string | null): T[] {
+  if (!images.length) return [];
+  if (variantId) {
+    const own = images.filter((i) => i.variantId === variantId);
+    if (own.length) return own;
+  }
+  const shared = images.filter((i) => !i.variantId);
+  return shared.length ? shared : images;
+}
+
 export function lineWithColor(productName: string, color?: string | null) {
   const c = color?.trim();
   if (!c || c.toLowerCase() === "default") return productName;

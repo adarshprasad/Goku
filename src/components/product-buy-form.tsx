@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import { addToCart } from "@/app/actions/cart";
 import { formatInr, waLink } from "@/lib/utils";
 import { contrastInk, swatchHex, variantLabel } from "@/lib/colors";
@@ -27,6 +26,8 @@ export function ProductBuyForm({
   madeToOrder,
   variants,
   addons,
+  selectedId,
+  onSelect,
 }: {
   productId: string;
   productName: string;
@@ -37,13 +38,10 @@ export function ProductBuyForm({
   madeToOrder: boolean;
   variants: BuyVariant[];
   addons: Addon[];
+  selectedId: string;
+  onSelect: (id: string) => void;
 }) {
-  const initial = useMemo(
-    () => variants.find((v) => v.stock > 0) ?? variants[0],
-    [variants],
-  );
-  const [selectedId, setSelectedId] = useState(initial?.id ?? "");
-  const selected = variants.find((v) => v.id === selectedId) ?? initial;
+  const selected = variants.find((v) => v.id === selectedId) ?? variants.find((v) => v.stock > 0) ?? variants[0];
   const available = Boolean(selected && (selected.stock > 0 || madeToOrder));
   const colour = selected ? variantLabel(selected) : "";
   const waHref = waLink(
@@ -78,12 +76,11 @@ export function ProductBuyForm({
                 role="option"
                 aria-selected={on}
                 aria-disabled={out}
-                disabled={out}
                 title={out ? `${label} — out of stock` : `${label} · ${v.stock} in atelier`}
-                onClick={() => setSelectedId(v.id)}
+                onClick={() => onSelect(v.id)}
                 className={`relative flex min-h-11 min-w-11 items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition ${
                   on ? "ring-2 ring-[var(--forest)] ring-offset-2 ring-offset-[var(--ivory)]" : "border-[var(--line)]"
-                } ${out ? "cursor-not-allowed opacity-40" : "hover:border-[var(--forest)]"}`}
+                } ${out ? "opacity-50 hover:border-[var(--forest)]" : "hover:border-[var(--forest)]"}`}
               >
                 <span
                   className="inline-block h-6 w-6 shrink-0 rounded-full border border-black/15"

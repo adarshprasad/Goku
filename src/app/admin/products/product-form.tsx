@@ -33,7 +33,7 @@ export type ProductEditorValue = {
   madeToOrder: boolean;
   variants: ColorRow[];
   collectionIds: string[];
-  images: { id: string; url: string; alt: string }[];
+  images: { id: string; url: string; alt: string; variantId?: string | null }[];
 };
 
 const empty: ProductEditorValue = {
@@ -161,6 +161,21 @@ export function ProductEditor({
             <div key={img.id} className="border border-[var(--line)] p-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={img.url} alt={img.alt} className="aspect-[3/4] w-full object-cover" />
+              <label className="mt-2 block text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+                Shown for
+                <select
+                  name={`imageVariant_${img.id}`}
+                  defaultValue={img.variantId ?? ""}
+                  className="mt-1 min-h-9 w-full border border-[var(--line)] bg-[var(--ivory)] px-1 text-sm normal-case tracking-normal"
+                >
+                  <option value="">All colours</option>
+                  {p.variants.filter((v) => v.id).map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.color || "Colour"}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <form action={deleteProductImage} className="mt-2">
                 <input type="hidden" name="imageId" value={img.id} />
                 <input type="hidden" name="productId" value={p.id} />
@@ -171,7 +186,7 @@ export function ProductEditor({
         </div>
       ) : null}
       <label className="block text-sm">
-        <span className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">Add photographs</span>
+        <span className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">Shared photographs (all colours)</span>
         <input name="photos" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple className="mt-2 block w-full text-sm" />
       </label>
       <button className="min-h-12 bg-[var(--forest)] px-8 text-[var(--ivory)]">Save drape</button>

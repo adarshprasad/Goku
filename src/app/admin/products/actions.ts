@@ -39,6 +39,29 @@ async function uniqueVariantSku(raw: string, excludeId?: string) {
   }
 }
 
+async function attachVariantPhotos(productId: string, name: string, variantIds: { id: string }[], formData: FormData) {
+  const maxSort = await prisma.productImage.aggregate({ where: { productId }, _max: { sortOrder: true } });
+  let sort = (maxSort._max.sortOrder ?? -1) + 1;
+  for (let i = 0; i < variantIds.length; i++) {
+    const urls = await saveUploads(filesFromForm(formData, `variantPhotos_${i}`));
+    for (const url of urls) {
+      await prisma.productImage.create({
+        data: { productId, variantId: variantIds[i].id, url, alt: name, sortOrder: sort++ },
+      });
+    }
+  }
+  const existing = await prisma.productImage.findMany({ where: { productId } });
+  const valid = new Set(variantIds.map((v) => v.id));
+  for (const img of existing) {
+    const raw = formData.get(`imageVariant_${img.id}`);
+    if (typeof raw !== "string") continue;
+    const variantId = raw && valid.has(raw) ? raw : null;
+    if (img.variantId !== variantId) {
+      await prisma.productImage.update({ where: { id: img.id }, data: { variantId } });
+    }
+  }
+}
+
 async function syncColorVariants(productId: string, skuBase: string, formData: FormData) {
   const ids = formData.getAll("variantId").map(String);
   const colors = formData.getAll("variantColor").map(String);
@@ -119,6 +142,12 @@ async function syncColorVariants(productId: string, skuBase: string, formData: F
       inStock: (sum._sum.stock ?? 0) > 0,
     },
   });
+
+  return prisma.productVariant.findMany({
+    where: { productId },
+    orderBy: { sortOrder: "asc" },
+    select: { id: true },
+  });
 }
 
 export async function saveProduct(formData: FormData) {
@@ -171,7 +200,7 @@ export async function saveProduct(formData: FormData) {
       });
     }
     const skuBase = String(formData.get("sku") || data.color || "TAV");
-    await syncColorVariants(id, skuBase, formData);
+    const variantIds = await syncColorVariants(id, skuBase, formData);
     const maxSort = await prisma.productImage.aggregate({ where: { productId: id }, _max: { sortOrder: true } });
     let sort = (maxSort._max.sortOrder ?? -1) + 1;
     for (const url of urls) {
@@ -179,6 +208,7 @@ export async function saveProduct(formData: FormData) {
         data: { productId: id, url, alt: name, sortOrder: sort++ },
       });
     }
+    await attachVariantPhotos(id, name, variantIds, formData);
     revalidatePath("/shop");
     revalidatePath(`/product/${slug}`);
     revalidatePath("/admin/products");
@@ -198,7 +228,8 @@ export async function saveProduct(formData: FormData) {
         : undefined,
     },
   });
-  await syncColorVariants(created.id, sku, formData);
+  const variantIds = await syncColorVariants(created.id, sku, formData);
+  await attachVariantPhotos(created.id, name, variantIds, formData);
   revalidatePath("/shop");
   revalidatePath("/admin/products");
   redirect(`/admin/products/${created.id}`);

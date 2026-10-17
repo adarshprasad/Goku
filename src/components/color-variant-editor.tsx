@@ -9,6 +9,7 @@ export type ColorRow = {
   hex: string;
   sku: string;
   stock: number;
+  images?: { id: string; url: string }[];
 };
 
 export function ColorVariantEditor({ variants }: { variants: ColorRow[] }) {
@@ -30,7 +31,7 @@ export function ColorVariantEditor({ variants }: { variants: ColorRow[] }) {
     <fieldset className="space-y-3 border border-[var(--line)] p-4">
       <legend className="px-1 text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">Colour inventory</legend>
       <p className="text-sm text-[var(--muted)]">
-        Each colour is its own stock. Zero stock greys out that swatch on the shop. Hex is the button colour customers see.
+        Each colour is its own stock. Upload photos on the colour row (or assign existing photos below). Those photos replace the gallery when a customer taps that swatch.
       </p>
       {rows.map((row, i) => (
         <div key={`${row.id || "new"}-${i}`} className="grid gap-3 border-t border-[var(--line)] pt-3 md:grid-cols-[auto_1fr_1fr_5rem_auto] md:items-end">
@@ -92,6 +93,24 @@ export function ColorVariantEditor({ variants }: { variants: ColorRow[] }) {
           <button type="button" onClick={() => removeRow(i)} className="min-h-11 text-sm underline">
             Remove
           </button>
+          <label className="block text-sm md:col-span-5">
+            <span className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">Photos for this colour</span>
+            <input
+              name={`variantPhotos_${i}`}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              multiple
+              className="mt-2 block w-full text-sm"
+            />
+          </label>
+          {row.images?.length ? (
+            <div className="flex flex-wrap gap-2 md:col-span-5">
+              {row.images.map((img) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={img.id} src={img.url} alt="" className="h-16 w-12 object-cover" />
+              ))}
+            </div>
+          ) : null}
         </div>
       ))}
       <button type="button" onClick={addRow} className="min-h-11 border border-[var(--forest)] px-4 text-sm">
