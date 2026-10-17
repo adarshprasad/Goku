@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { getBrand } from "@/lib/brand";
 import { buildWhatsAppOrderText, waMe } from "@/lib/whatsapp-order";
+import { decrementStockAndMarkPaid } from "@/lib/orders";
 
 export default async function AdminOrders() {
   const [brand, orders] = await Promise.all([
@@ -23,6 +24,9 @@ export default async function AdminOrders() {
     const trackingNumber = String(formData.get("trackingNumber") || "") || null;
     const trackingUrl = String(formData.get("trackingUrl") || "") || null;
     const paymentStatus = String(formData.get("paymentStatus") || "");
+    if (paymentStatus === "PAID") {
+      await decrementStockAndMarkPaid(id);
+    }
     await prisma.order.update({
       where: { id },
       data: {
@@ -59,6 +63,9 @@ export default async function AdminOrders() {
                 <p className="font-serif text-xl">{o.number}</p>
                 <p className="text-sm text-[var(--muted)]">
                   {o.email} · {o.paymentMethod} · {o.paymentStatus} · {formatInr(o.totalPaise)}
+                </p>
+                <p className="mt-1 text-xs text-[var(--muted)]">
+                  {o.items.map((i) => `${i.name} × ${i.quantity}`).join(" · ")}
                 </p>
               </div>
               <select name="status" defaultValue={o.status} className="min-h-11 border border-[var(--line)] px-2">

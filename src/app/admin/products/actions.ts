@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireStaff } from "@/lib/admin";
 import { filesFromForm, rupeesToPaise, slugify } from "@/lib/slug";
 import { saveUploads } from "@/lib/uploads";
+import { swatchHex } from "@/lib/colors";
 
 async function uniqueSlug(base: string, excludeId?: string) {
   let slug = slugify(base);
@@ -17,13 +18,107 @@ async function uniqueSlug(base: string, excludeId?: string) {
   }
 }
 
-async function uniqueSku(raw: string) {
+async function uniqueSku(raw: string, excludeId?: string) {
   let sku = raw.trim().toUpperCase() || `TAV-${Date.now()}`;
   let n = 2;
-  while (await prisma.product.findUnique({ where: { sku } })) {
+  while (true) {
+    const found = await prisma.product.findUnique({ where: { sku } });
+    if (!found || found.id === excludeId) return sku;
     sku = `${raw.trim().toUpperCase() || "TAV"}-${n++}`;
   }
-  return sku;
+}
+
+async function uniqueVariantSku(raw: string, excludeId?: string) {
+  const base = raw.trim().toUpperCase().replace(/\s+/g, "-") || `TAV-${Date.now()}`;
+  let sku = base;
+  let n = 2;
+  while (true) {
+    const found = await prisma.productVariant.findUnique({ where: { sku } });
+    if (!found || found.id === excludeId) return sku;
+    sku = `${base}-${n++}`;
+  }
+}
+
+async function syncColorVariants(productId: string, skuBase: string, formData: FormData) {
+  const ids = formData.getAll("variantId").map(String);
+  const colors = formData.getAll("variantColor").map(String);
+  const hexes = formData.getAll("variantHex").map(String);
+  const skus = formData.getAll("variantSku").map(String);
+  const stocks = formData.getAll("variantStock").map(String);
+  const existing = await prisma.productVariant.findMany({ where: { productId } });
+  const keep = new Set<string>();
+  const count = Math.max(ids.length, colors.length);
+
+  for (let i = 0; i < count; i++) {
+    const color = (colors[i] || "").trim() || "Default";
+    const hex = swatchHex(color, hexes[i]);
+    const stock = Math.max(0, Math.floor(Number(stocks[i] || 0)));
+    const id = ids[i] || "";
+    const skuHint = (skus[i] || "").trim() || `${skuBase}-${slugify(color).slice(0, 10) || i + 1}`;
+    if (id && existing.some((e) => e.id === id)) {
+      await prisma.productVariant.update({
+        where: { id },
+        data: {
+          name: color,
+          color,
+          hex,
+          stock,
+          sku: await uniqueVariantSku(skuHint, id),
+          sortOrder: i,
+        },
+      });
+      keep.add(id);
+    } else {
+      const created = await prisma.productVariant.create({
+        data: {
+          productId,
+          name: color,
+          color,
+          hex,
+          stock,
+          sku: await uniqueVariantSku(skuHint),
+          sortOrder: i,
+        },
+      });
+      keep.add(created.id);
+    }
+  }
+
+  for (const v of existing) {
+    if (keep.has(v.id)) continue;
+    const sold = await prisma.orderItem.count({ where: { variantId: v.id } });
+    if (sold) {
+      await prisma.productVariant.update({ where: { id: v.id }, data: { stock: 0 } });
+    } else {
+      await prisma.cartItem.deleteMany({ where: { variantId: v.id } });
+      await prisma.productVariant.delete({ where: { id: v.id } });
+    }
+  }
+
+  if ((await prisma.productVariant.count({ where: { productId } })) === 0) {
+    await prisma.productVariant.create({
+      data: {
+        productId,
+        name: "Default",
+        color: "Default",
+        hex: "#284232",
+        sku: await uniqueVariantSku(`${skuBase}-DEF`),
+        stock: 0,
+      },
+    });
+  }
+
+  const [first, sum] = await Promise.all([
+    prisma.productVariant.findFirst({ where: { productId }, orderBy: { sortOrder: "asc" } }),
+    prisma.productVariant.aggregate({ where: { productId }, _sum: { stock: true } }),
+  ]);
+  await prisma.product.update({
+    where: { id: productId },
+    data: {
+      color: first?.color || first?.name || "",
+      inStock: (sum._sum.stock ?? 0) > 0,
+    },
+  });
 }
 
 export async function saveProduct(formData: FormData) {
@@ -53,7 +148,7 @@ export async function saveProduct(formData: FormData) {
     fabric: String(formData.get("fabric") || ""),
     work: String(formData.get("work") || "None"),
     occasion: String(formData.get("occasion") || "Festive"),
-    color: String(formData.get("color") || ""),
+    color: String(formData.get("variantColor") || formData.get("color") || ""),
     motif: String(formData.get("motif") || "") || null,
     border: String(formData.get("border") || "") || null,
     pallu: String(formData.get("pallu") || "") || null,
@@ -67,8 +162,6 @@ export async function saveProduct(formData: FormData) {
     inStock: formData.get("inStock") !== "off",
   };
 
-  const stock = Number(formData.get("stock") || 0);
-
   if (id) {
     await prisma.product.update({ where: { id }, data });
     await prisma.collectionProduct.deleteMany({ where: { productId: id } });
@@ -77,13 +170,8 @@ export async function saveProduct(formData: FormData) {
         data: collectionIds.map((collectionId) => ({ collectionId, productId: id })),
       });
     }
-    const variantId = String(formData.get("variantId") || "");
-    if (variantId) {
-      await prisma.productVariant.update({
-        where: { id: variantId },
-        data: { stock },
-      });
-    }
+    const skuBase = String(formData.get("sku") || data.color || "TAV");
+    await syncColorVariants(id, skuBase, formData);
     const maxSort = await prisma.productImage.aggregate({ where: { productId: id }, _max: { sortOrder: true } });
     let sort = (maxSort._max.sortOrder ?? -1) + 1;
     for (const url of urls) {
@@ -102,9 +190,6 @@ export async function saveProduct(formData: FormData) {
     data: {
       ...data,
       sku,
-      variants: {
-        create: { name: "Default", sku: `${sku}-DEF`, stock },
-      },
       images: {
         create: urls.map((url, i) => ({ url, alt: name, sortOrder: i })),
       },
@@ -113,6 +198,7 @@ export async function saveProduct(formData: FormData) {
         : undefined,
     },
   });
+  await syncColorVariants(created.id, sku, formData);
   revalidatePath("/shop");
   revalidatePath("/admin/products");
   redirect(`/admin/products/${created.id}`);

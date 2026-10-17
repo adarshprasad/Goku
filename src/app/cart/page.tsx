@@ -39,7 +39,10 @@ export default async function CartPage() {
                 <Link href={`/product/${item.product.slug}`} className="font-serif text-xl">
                   {item.product.name}
                 </Link>
-                <p className="text-sm text-[var(--muted)]">{item.variant?.name}</p>
+                <p className="text-sm text-[var(--muted)]">
+                  {item.variant?.color || item.variant?.name}
+                  {item.variant && item.variant.stock < 1 ? " · out of stock" : ""}
+                </p>
                 <p className="text-sm">
                   {parseAddons(item.addons)
                     .map((s) => addonNames.get(s))

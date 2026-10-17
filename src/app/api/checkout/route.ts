@@ -7,6 +7,7 @@ import { applyCoupon, type CouponInput } from "@/lib/coupons";
 import { shippingForPincode, gstRateForApparel } from "@/lib/money";
 import { getBrand } from "@/lib/brand";
 import { buildWhatsAppOrderText, waMe } from "@/lib/whatsapp-order";
+import { lineWithColor, variantLabel } from "@/lib/colors";
 
 const checkoutSchema = z.object({
   email: z.string().email(),
@@ -45,6 +46,16 @@ export async function POST(req: NextRequest) {
   }
 
   const { subtotal, lines } = await cartTotals(cart);
+  for (const l of lines) {
+    const stock = l.item.variant?.stock ?? 0;
+    if (!l.item.product.madeToOrder && stock < l.item.quantity) {
+      const colour = l.item.variant ? variantLabel(l.item.variant) : "this colour";
+      return NextResponse.json(
+        { error: `${l.item.product.name} (${colour}) is out of stock.` },
+        { status: 400 },
+      );
+    }
+  }
   let couponRow = null;
   if (data.coupon) {
     couponRow = await prisma.coupon.findUnique({ where: { code: data.coupon.trim().toUpperCase() } });
@@ -132,7 +143,7 @@ export async function POST(req: NextRequest) {
         create: lines.map((l) => ({
           productId: l.item.productId,
           variantId: l.item.variantId,
-          name: l.item.product.name,
+          name: lineWithColor(l.item.product.name, l.item.variant ? variantLabel(l.item.variant) : null),
           sku: l.item.variant?.sku ?? l.item.product.sku,
           hsn: l.item.product.hsn,
           quantity: l.item.quantity,
@@ -162,9 +173,10 @@ export async function POST(req: NextRequest) {
     coupon: couponRow?.code,
     totalPaise: total,
     items: lines.map((l) => ({
-      name: l.item.product.name,
+      name: lineWithColor(l.item.product.name, l.item.variant ? variantLabel(l.item.variant) : null),
       quantity: l.item.quantity,
       sku: l.item.variant?.sku ?? l.item.product.sku,
+      color: l.item.variant ? variantLabel(l.item.variant) : undefined,
     })),
     siteUrl: brand.siteUrl,
   });

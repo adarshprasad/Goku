@@ -158,9 +158,11 @@ model ProductVariant {
   name         String
   sku          String     @unique
   color        String?
+  hex          String?
   blouseSize   String?
   stock        Int        @default(0)
   pricePaise   Int?
+  sortOrder    Int        @default(0)
   cartItems    CartItem[]
   orderItems   OrderItem[]
 }

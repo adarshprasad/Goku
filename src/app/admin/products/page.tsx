@@ -29,7 +29,8 @@ export default async function AdminProducts() {
             <div className="min-w-0 flex-1">
               <p className="font-serif text-lg">{p.name}</p>
               <p className="text-xs text-[var(--muted)]">
-                {p.sku} · {p.published ? "Live" : "Hidden"} · stock {p.variants[0]?.stock ?? 0}
+                {p.sku} · {p.published ? "Live" : "Hidden"} · {p.variants.length} colour
+                {p.variants.length === 1 ? "" : "s"} · stock {p.variants.reduce((s, v) => s + v.stock, 0)}
               </p>
             </div>
             <p className="text-sm">{formatInr(p.pricePaise)}</p>

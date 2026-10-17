@@ -6,7 +6,7 @@ export function waMe(phone: string, text: string) {
   return waLink(text, phone);
 }
 
-export type WhatsAppOrderLine = { name: string; quantity: number; sku?: string };
+export type WhatsAppOrderLine = { name: string; quantity: number; sku?: string; color?: string };
 
 export function buildWhatsAppOrderText(opts: {
   brandName: string;
@@ -25,7 +25,10 @@ export function buildWhatsAppOrderText(opts: {
 }) {
   const items = opts.items
     .slice(0, 12)
-    .map((i) => `• ${i.name} × ${i.quantity}${i.sku ? ` (${i.sku})` : ""}`)
+    .map((i) => {
+      const colour = i.color?.trim() && !i.name.toLowerCase().includes(i.color.trim().toLowerCase()) ? ` — ${i.color.trim()}` : "";
+      return `• ${i.name}${colour} × ${i.quantity}${i.sku ? ` (${i.sku})` : ""}`;
+    })
     .join("\n");
   const extra = opts.items.length > 12 ? `\n• …and ${opts.items.length - 12} more` : "";
   const note = opts.notes?.trim() ? `\nNote: ${opts.notes.trim()}` : "";
@@ -47,10 +50,12 @@ export function buildWhatsAppProductText(opts: {
   name: string;
   pricePaise: number;
   url: string;
+  color?: string;
 }) {
+  const colour = opts.color?.trim() ? `\nColour: ${opts.color.trim()}` : "";
   return `Namaskara, I would like this ${opts.brandName} drape:
 
-${opts.name}
+${opts.name}${colour}
 ${formatInr(opts.pricePaise)}
 ${opts.url}
 

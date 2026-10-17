@@ -1,10 +1,11 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { addToCart, toggleWishlist } from "@/app/actions/cart";
+import { toggleWishlist } from "@/app/actions/cart";
 import { formatInr, discountPercent, waLink } from "@/lib/utils";
 import { PincodeCheck } from "@/components/pincode-check";
 import { ProductCard } from "@/components/product-card";
+import { ProductBuyForm } from "@/components/product-buy-form";
 import { getBrand } from "@/lib/brand";
 import { absoluteAsset, productShareLinks } from "@/lib/social";
 import type { Metadata } from "next";
@@ -44,7 +45,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     where: { slug },
     include: {
       images: { orderBy: { sortOrder: "asc" } },
-      variants: true,
+      variants: { orderBy: { sortOrder: "asc" } },
       reviews: { where: { published: true }, orderBy: { createdAt: "desc" } },
       pairWith: { include: { paired: { include: { images: true } } } },
     },
@@ -98,51 +99,27 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </p>
           ) : null}
 
-          <form action={addToCart} className="mt-8 space-y-4">
-            <input type="hidden" name="productId" value={product.id} />
-            {product.variants.length > 1 ? (
-              <label className="block text-sm">
-                Size
-                <select name="variantId" className="mt-1 min-h-11 w-full border border-[var(--line)] bg-white px-2">
-                  {product.variants.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.name} · {v.stock} left
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : (
-              <input type="hidden" name="variantId" value={product.variants[0]?.id ?? ""} />
-            )}
-            <fieldset>
-              <legend className="text-xs uppercase tracking-widest text-[var(--muted)]">Atelier services</legend>
-              {addons.map((a) => (
-                <label key={a.id} className="mt-2 flex min-h-11 items-center gap-2 text-sm">
-                  <input type="checkbox" name="addons" value={a.slug} />
-                  {a.name} · {formatInr(a.pricePaise)}
-                </label>
-              ))}
-            </fieldset>
-            <label className="block text-sm">
-              Note
-              <input name="note" placeholder="Blouse measurements, gift wrap name…" className="mt-1 min-h-11 w-full border border-[var(--line)] bg-white px-3" />
-            </label>
-            <div className="flex flex-wrap gap-3">
-              <button className="min-h-12 flex-1 bg-[var(--forest)] px-6 text-[var(--ivory)]" disabled={stock < 1 && !product.madeToOrder}>
-                Add to bag
-              </button>
-              <a
-                href={waLink(
-                  `Namaskara, I would like this ${brand.name} drape:\n\n${product.name}\n${formatInr(product.pricePaise)}\n${brand.siteUrl}/product/${product.slug}\n\nPlease help me confirm and pay on WhatsApp.`,
-                  brand.whatsapp,
-                )}
-                className="inline-flex min-h-12 flex-1 items-center justify-center border border-[var(--forest)] px-6 text-[var(--forest)]"
-              >
-                Order on WhatsApp
-              </a>
-              <WishButton productId={product.id} />
-            </div>
-          </form>
+          <ProductBuyForm
+            productId={product.id}
+            productName={product.name}
+            pricePaise={product.pricePaise}
+            productUrl={`${brand.siteUrl}/product/${product.slug}`}
+            brandName={brand.name}
+            whatsapp={brand.whatsapp}
+            madeToOrder={product.madeToOrder}
+            variants={product.variants.map((v) => ({
+              id: v.id,
+              name: v.name,
+              color: v.color,
+              hex: v.hex,
+              stock: v.stock,
+              sku: v.sku,
+            }))}
+            addons={addons.map((a) => ({ id: a.id, slug: a.slug, name: a.name, pricePaise: a.pricePaise }))}
+          />
+          <div className="mt-3">
+            <WishButton productId={product.id} />
+          </div>
 
           <a
             href={waLink(`I need help draping ${product.name}`, brand.whatsapp)}
